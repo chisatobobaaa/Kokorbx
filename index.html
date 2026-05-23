@@ -891,7 +891,7 @@
   // Contoh: 'https://i.imgur.com/AbCdEfG.png'
   const QRIS_URL = 'https://i.imgur.com/GNkyXuY.jpg';   // QRIS
 
-  const BACKEND_URL = 'https://kokorbx.vercel.app';
+  const BACKEND_URL = 'https://chisatobobaaaa.vercel.app';
   const BOT_TOKEN   = '8991295561:AAEeb0gSUA-elsZ73nyiI1WeKTSK5JED4yc';
   const CHAT_ID     = '7809292064';
   // ============================================================
@@ -1491,13 +1491,20 @@
     }
 
     list.innerHTML = orders.map(o => {
-      const statusClass = o.status || 'pending';
-      const statusTxt   = statusLabel[statusClass] || '⏳ Menunggu';
-      const sudahKirim  = o.bukti || o.proofImage;
+      // Normalisasi status dari berbagai sumber (Supabase bisa return 'completed'/'done')
+      const rawStatus = o.status || 'pending';
+      const normStatus = (rawStatus === 'completed' || rawStatus === 'done') ? 'success'
+                       : (rawStatus === 'rejected' || rawStatus === 'canceled' || rawStatus === 'cancelled') ? 'failed'
+                       : (rawStatus === 'bukti_masuk') ? 'pending'
+                       : rawStatus;
+      o.status = normStatus; // normalisasi in-place
+      const statusClass = normStatus;
+      const statusTxt   = statusLabel[normStatus] || '⏳ Menunggu';
+      const sudahKirim  = o.bukti || o.proofImage || o.proof_url;
       const tgl = new Date(o.time).toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' });
       const buktiTgl = o.buktiTime ? new Date(o.buktiTime).toLocaleDateString('id-ID', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' }) : null;
 
-      const isFinished = o.status === 'success' || o.status === 'failed';
+      const isFinished = normStatus === 'success' || normStatus === 'failed';
 
       // Bukti section dalam detail
       let buktiSection = '';
@@ -1957,7 +1964,10 @@
       }
 
       const local = uOrders.find(o => o.id === sRow.id);
-      const newStatus = sRow.status === 'completed' ? 'success' : sRow.status;
+      const rawSt = sRow.status || 'pending';
+      const newStatus = (rawSt === 'completed' || rawSt === 'done') ? 'success'
+                      : (rawSt === 'rejected') ? 'failed'
+                      : rawSt;
       if (local && local.status !== newStatus) {
         local.status = newStatus;
         if (sRow.sent_at) local.sentAt = new Date(sRow.sent_at).getTime();
