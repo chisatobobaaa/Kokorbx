@@ -1,0 +1,2071 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kokorbx — Top Up via Gamepass</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://app.midtrans.com/snap/snap.js" data-client-key="Mid-client-vIdf2mWg0tpgpzKH"></script>
+<style>
+  :root {
+    --bg: #060608;
+    --s1: #0e0e14;
+    --s2: #14141e;
+    --s3: #1a1a28;
+    --border: #252535;
+    --border2: #2e2e45;
+    --accent: #7c5cfc;
+    --accent-glow: rgba(124,92,252,0.25);
+    --accent2: #fc5c7d;
+    --gold: #ffc857;
+    --green: #39d98a;
+    --text: #eeeef5;
+    --muted: #636380;
+  }
+  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+  body { background: var(--bg); color: var(--text); font-family: 'JetBrains Mono', monospace; min-height: 100vh; overflow-x: hidden; }
+  .bg-fx { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+  .bg-fx::before { content: ''; position: absolute; top: -30%; left: -20%; width: 70%; height: 70%; background: radial-gradient(ellipse, rgba(124,92,252,0.08) 0%, transparent 65%); animation: bgFloat 8s ease-in-out infinite alternate; }
+  .bg-fx::after { content: ''; position: absolute; bottom: -20%; right: -10%; width: 60%; height: 60%; background: radial-gradient(ellipse, rgba(252,92,125,0.06) 0%, transparent 65%); animation: bgFloat 10s ease-in-out infinite alternate-reverse; }
+  @keyframes bgFloat { from{transform:translate(0,0)} to{transform:translate(3%,4%)} }
+  .grid-fx { position: fixed; inset: 0; z-index: 0; pointer-events: none; background-image: linear-gradient(rgba(124,92,252,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(124,92,252,0.04) 1px, transparent 1px); background-size: 50px 50px; }
+  .wrapper { position: relative; z-index: 1; }
+  header { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; border-bottom: 1px solid var(--border); background: rgba(6,6,8,0.9); backdrop-filter: blur(20px); position: sticky; top: 0; z-index: 100; gap: 8px; }
+  .logo { font-family: 'Outfit', sans-serif; font-weight: 900; font-size: 1.1rem; letter-spacing: -0.5px; display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+  .logo-gem { width: 26px; height: 26px; background: linear-gradient(135deg, var(--accent), var(--accent2)); border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; box-shadow: 0 0 12px var(--accent-glow); }
+  .logo-text { color: var(--text); }
+  .logo-text em { font-style: normal; color: var(--accent); }
+  .header-right { display: flex; align-items: center; gap: 8px; flex-wrap: nowrap; overflow: hidden; }
+  .live-badge { display: flex; align-items: center; gap: 6px; background: rgba(57,217,138,0.08); border: 1px solid rgba(57,217,138,0.2); border-radius: 20px; padding: 5px 10px; font-size: 0.65rem; color: var(--green); letter-spacing: 0.3px; white-space: nowrap; }
+  @media(max-width:520px) { .live-badge { display: none; } }
+  @media(max-width:400px) { header { padding: 10px 12px; } }
+  .live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: pulse 1.5s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.8)} }
+  .hero { max-width: 680px; margin: 0 auto; text-align: center; padding: 28px 16px 16px; animation: heroIn 0.6s ease both; }
+  @keyframes heroIn { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+  .hero-eyebrow { display: inline-flex; align-items: center; gap: 6px; font-size: 0.62rem; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); border: 1px solid rgba(124,92,252,0.3); background: rgba(124,92,252,0.06); padding: 5px 14px; border-radius: 20px; margin-bottom: 14px; }
+  .hero h1 { font-family: 'Outfit', sans-serif; font-weight: 900; font-size: clamp(1.6rem, 7vw, 2.8rem); line-height: 1.1; letter-spacing: -1.5px; margin-bottom: 10px; }
+  .hero h1 .g1 { color: var(--accent); }
+  .hero h1 .g2 { background: linear-gradient(90deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .hero p { font-size: 0.78rem; color: var(--muted); line-height: 1.7; max-width: 420px; margin: 0 auto; }
+  .how-section { max-width: 860px; margin: 0 auto 8px; padding: 0 14px; }
+  .how-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+  @media(max-width:650px) { .how-grid { grid-template-columns: repeat(2,1fr); } }
+  .how-step { background: var(--s2); border: 1px solid var(--border); border-radius: 10px; padding: 14px 12px; text-align: center; position: relative; overflow: hidden; transition: border-color 0.2s, transform 0.2s; animation: cardIn 0.5s ease both; }
+  .how-step:nth-child(1){animation-delay:0.1s} .how-step:nth-child(2){animation-delay:0.2s} .how-step:nth-child(3){animation-delay:0.3s} .how-step:nth-child(4){animation-delay:0.4s}
+  @keyframes cardIn { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+  .how-step:hover { border-color: rgba(124,92,252,0.4); transform: translateY(-2px); }
+  .how-num { position: absolute; top: 8px; right: 10px; font-family: 'Outfit', sans-serif; font-size: 1.3rem; font-weight: 900; color: rgba(124,92,252,0.12); line-height: 1; }
+  .how-icon { font-size: 1.3rem; margin-bottom: 7px; display: block; }
+  .how-title { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 0.75rem; margin-bottom: 4px; color: var(--text); }
+  .how-desc { font-size: 0.64rem; color: var(--muted); line-height: 1.4; }
+  .main { max-width: 960px; margin: 12px auto 0; padding: 0 14px 60px; display: grid; grid-template-columns: 1fr 300px; gap: 12px; align-items: start; }
+  @media(max-width:720px) { .main { grid-template-columns: 1fr; padding: 0 12px 60px; } }
+  .card { background: var(--s1); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 10px; transition: border-color 0.2s; }
+  .card:hover { border-color: var(--border2); }
+  .card-head { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+  .card-head-icon { width: 32px; height: 32px; border-radius: 9px; background: linear-gradient(135deg, rgba(124,92,252,0.15), rgba(252,92,125,0.1)); border: 1px solid rgba(124,92,252,0.25); display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; }
+  .card-head-title { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 0.85rem; color: var(--text); }
+  .card-head-sub { font-size: 0.63rem; color: var(--muted); margin-top: 2px; }
+  .pkg-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 7px; }
+  @media(max-width:600px) { .pkg-grid { grid-template-columns: repeat(3,1fr); gap: 6px; } }
+  .pkg { background: var(--s2); border: 1px solid var(--border); border-radius: 9px; padding: 10px 7px; cursor: pointer; text-align: center; transition: all 0.18s; position: relative; overflow: hidden; user-select: none; }
+  .pkg::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(124,92,252,0.08), transparent); opacity: 0; transition: opacity 0.2s; }
+  .pkg:hover::before { opacity: 1; }
+  .pkg:hover { border-color: rgba(124,92,252,0.45); transform: translateY(-2px); }
+  .pkg.selected { border-color: var(--accent); background: rgba(124,92,252,0.08); box-shadow: 0 0 18px rgba(124,92,252,0.15), inset 0 0 0 1px rgba(124,92,252,0.3); }
+  .pkg.selected::after { content: '✓'; position: absolute; top: 5px; right: 7px; width: 14px; height: 14px; background: var(--accent); color: #fff; border-radius: 50%; font-size: 0.5rem; display: flex; align-items: center; justify-content: center; font-weight: 700; }
+  .pkg.hot .hot-tag { display: block; position: absolute; top: 0; left: 50%; transform: translateX(-50%); background: linear-gradient(90deg, var(--accent), var(--accent2)); color: #fff; font-size: 0.45rem; font-weight: 700; letter-spacing: 0.5px; padding: 2px 8px; border-radius: 0 0 5px 5px; text-transform: uppercase; }
+  .hot-tag { display: none; }
+  .pkg-emoji { font-size: 1.1rem; display: block; margin-bottom: 5px; }
+  .pkg-amount { font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 0.82rem; color: var(--text); margin-bottom: 2px; }
+  .pkg-price { font-size: 0.65rem; color: var(--accent); }
+  .pkg-bonus { font-size: 0.58rem; color: var(--green); margin-top: 2px; }
+  .field { margin-bottom: 12px; }
+  .field label { display: flex; align-items: center; gap: 5px; font-size: 0.64rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 6px; }
+  .field label .req { color: var(--accent2); }
+  .input-wrap { position: relative; width: 100%; }
+  .input-wrap input { width: 100%; max-width: 100%; background: var(--s2); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; outline: none; transition: border-color 0.2s, box-shadow 0.2s; box-sizing: border-box; }
+  .input-wrap input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(124,92,252,0.1); }
+  .input-wrap input::placeholder { color: rgba(100,100,128,0.6); }
+  .input-hint { font-size: 0.62rem; color: var(--muted); margin-top: 5px; line-height: 1.5; display: flex; align-items: flex-start; gap: 4px; }
+  .gamepass-guide { background: linear-gradient(135deg, rgba(124,92,252,0.06), rgba(252,92,125,0.04)); border: 1px solid rgba(124,92,252,0.2); border-radius: 9px; padding: 12px; margin-bottom: 12px; }
+  .gp-guide-title { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 0.75rem; color: var(--accent); margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+  .gp-steps { display: flex; flex-direction: column; gap: 6px; }
+  .gp-step { display: flex; align-items: flex-start; gap: 8px; font-size: 0.68rem; color: var(--muted); line-height: 1.5; }
+  .gp-step-num { width: 18px; height: 18px; border-radius: 50%; background: rgba(124,92,252,0.15); border: 1px solid rgba(124,92,252,0.3); display: flex; align-items: center; justify-content: center; font-size: 0.55rem; color: var(--accent); flex-shrink: 0; font-weight: 700; }
+  .gp-input-box { background: var(--s2); border: 1px dashed rgba(124,92,252,0.4); border-radius: 9px; padding: 12px; }
+  .gp-url-row { display: flex; gap: 7px; margin-bottom: 8px; min-width: 0; }
+  .gp-url-row input { flex: 1; min-width: 0; background: var(--s3); border: 1px solid var(--border); border-radius: 7px; padding: 9px 11px; color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; outline: none; transition: border-color 0.2s; width: 0; box-sizing: border-box; }
+  .gp-url-row input:focus { border-color: var(--accent); }
+  .gp-url-row input::placeholder { color: rgba(100,100,128,0.5); }
+  .btn-extract { background: linear-gradient(135deg, var(--accent), #5b3de8); color: #fff; border: none; border-radius: 7px; padding: 9px 13px; font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; cursor: pointer; white-space: nowrap; transition: all 0.2s; font-weight: 600; flex-shrink: 0; }
+  .btn-extract:hover { transform: translateY(-1px); box-shadow: 0 5px 14px rgba(124,92,252,0.3); }
+  .gp-divider { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 0.62rem; color: var(--muted); letter-spacing: 0.8px; }
+  .gp-divider::before,.gp-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .gp-id-input { width: 100%; max-width: 100%; box-sizing: border-box; background: var(--s3); border: 1px solid var(--border); border-radius: 7px; padding: 9px 11px; color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; outline: none; transition: border-color 0.2s, box-shadow 0.2s; letter-spacing: 1px; }
+  .gp-id-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(124,92,252,0.1); }
+  .gp-id-input::placeholder { color: rgba(100,100,128,0.5); }
+  .gp-preview { display: none; background: var(--s3); border: 1px solid rgba(57,217,138,0.25); border-radius: 10px; padding: 14px; margin-top: 12px; animation: fadeIn 0.3s ease; }
+  .gp-preview.show { display: flex; gap: 12px; align-items: center; }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+  .gp-prev-icon { width: 48px; height: 48px; border-radius: 10px; background: linear-gradient(135deg, rgba(124,92,252,0.2), rgba(252,92,125,0.15)); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; }
+  .gp-prev-info { flex: 1; }
+  .gp-prev-name { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 0.85rem; margin-bottom: 3px; color: var(--text); }
+  .gp-prev-id { font-size: 0.68rem; color: var(--muted); }
+  .gp-prev-badge { display: inline-flex; align-items: center; gap: 5px; background: rgba(57,217,138,0.1); border: 1px solid rgba(57,217,138,0.3); border-radius: 6px; padding: 3px 9px; font-size: 0.65rem; color: var(--green); margin-top: 5px; }
+  .pay-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; }
+  .pay-btn { background: var(--s2); border: 1px solid var(--border); border-radius: 8px; padding: 10px 7px; cursor: pointer; text-align: center; transition: all 0.18s; user-select: none; }
+  .pay-btn:hover { border-color: rgba(124,92,252,0.4); }
+  .pay-btn.selected { border-color: var(--accent); background: rgba(124,92,252,0.07); }
+  .pay-icon { font-size: 1.1rem; display: block; margin-bottom: 4px; }
+  .pay-name { font-size: 0.68rem; color: var(--muted); }
+  .pay-btn.selected .pay-name { color: var(--accent); }
+  .summary { background: var(--s1); border: 1px solid var(--border); border-radius: 12px; padding: 16px; position: sticky; top: 70px; }
+  @media(max-width:720px) { .summary { position: static; } }
+  .sum-head { font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 0.88rem; margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 7px; }
+  .rbx-display { background: var(--s2); border: 1px solid var(--border); border-radius: 9px; padding: 14px; text-align: center; margin-bottom: 10px; position: relative; overflow: hidden; }
+  .rbx-display::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(124,92,252,0.06), rgba(252,92,125,0.04)); }
+  .rbx-display > * { position: relative; }
+  .rbx-big { font-family: 'Outfit', sans-serif; font-weight: 900; font-size: 2rem; letter-spacing: -1.5px; background: linear-gradient(135deg, var(--gold), #ffa040); -webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height: 1; margin-bottom: 3px; }
+  .rbx-sub { font-size: 0.63rem; color: var(--muted); }
+  .gp-sum-box { background: var(--s2); border: 1px solid var(--border); border-radius: 8px; padding: 9px 11px; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; font-size: 0.72rem; }
+  .gp-sum-icon { font-size: 1rem; }
+  .gp-sum-info { flex: 1; min-width: 0; }
+  .gp-sum-label { color: var(--muted); font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.8px; }
+  .gp-sum-val { font-family: 'Outfit', sans-serif; font-weight: 700; color: var(--text); font-size: 0.78rem; margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .gp-sum-val.empty { color: var(--muted); font-weight: 400; font-family: inherit; }
+  .sum-row { display: flex; justify-content: space-between; font-size: 0.73rem; margin-bottom: 8px; align-items: center; }
+  .sum-row .k { color: var(--muted); }
+  .sum-row .v { font-family: 'Outfit', sans-serif; font-weight: 600; }
+  .sum-divider { height: 1px; background: var(--border); margin: 10px 0; }
+  .sum-total { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+  .sum-total .k { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 0.82rem; }
+  .sum-total .v { font-family: 'Outfit', sans-serif; font-weight: 900; font-size: 1.2rem; background: linear-gradient(90deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .pend-box { background: rgba(255,200,87,0.06); border: 1px solid rgba(255,200,87,0.2); border-radius: 8px; padding: 10px; margin-bottom: 12px; font-size: 0.67rem; color: var(--gold); line-height: 1.6; display: flex; gap: 7px; }
+  .btn-order { width: 100%; background: linear-gradient(135deg, var(--accent) 0%, #5b3de8 50%, var(--accent2) 100%); background-size: 200% 200%; animation: gradShift 4s ease infinite; color: #fff; border: none; border-radius: 9px; padding: 13px; font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 0.85rem; letter-spacing: 0.3px; cursor: pointer; transition: all 0.2s; position: relative; overflow: hidden; }
+  @keyframes gradShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+  .btn-order::before { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent); transform: translateX(-100%); }
+  .btn-order:hover::before { animation: shimmer 0.6s ease; }
+  @keyframes shimmer { to{transform:translateX(100%)} }
+  .btn-order:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(124,92,252,0.35); }
+  .btn-order:disabled { background: var(--s2); color: var(--muted); animation: none; cursor: not-allowed; transform: none; box-shadow: none; border: 1px solid var(--border); }
+  .sum-footnote { text-align: center; font-size: 0.62rem; color: var(--muted); margin-top: 10px; line-height: 1.7; }
+  .modal-overlay { display: none; position: fixed; inset: 0; z-index: 9999; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); align-items: center; justify-content: center; padding: 12px; }
+  .modal-overlay.show { display: flex; }
+  .modal { background: var(--s1); border: 1px solid var(--border2); border-radius: 16px; padding: 18px 16px; max-width: 360px; width: 100%; max-height: 92vh; overflow-y: auto; text-align: center; animation: modalPop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both; position: relative; }
+  .modal::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 16px 16px 0 0; }
+  @keyframes modalPop { from{opacity:0;transform:scale(0.88) translateY(20px)} to{opacity:1;transform:scale(1) translateY(0)} }
+  .modal-icon-big { font-size: 1.8rem; margin-bottom: 6px; display: block; animation: iconBounce 0.6s 0.3s ease both; }
+  @keyframes iconBounce { from{transform:scale(0)} to{transform:scale(1)} }
+  .modal h2 { font-family: 'Outfit', sans-serif; font-weight: 900; font-size: 1.1rem; letter-spacing: -0.3px; margin-bottom: 6px; }
+  .status-chip { display: inline-flex; align-items: center; gap: 6px; background: rgba(255,200,87,0.1); border: 1px solid rgba(255,200,87,0.3); border-radius: 20px; padding: 5px 14px; font-size: 0.67rem; color: var(--gold); letter-spacing: 0.8px; text-transform: uppercase; margin-bottom: 16px; }
+  .modal-progress { width: 100%; height: 4px; background: var(--border); border-radius: 3px; overflow: hidden; margin-bottom: 14px; }
+  .modal-progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2), var(--gold)); background-size: 200% 100%; animation: progAnim 1.8s ease-in-out infinite alternate, gradMove 3s linear infinite; border-radius: 3px; width: 55%; }
+  @keyframes progAnim { from{width:25%} to{width:75%} }
+  @keyframes gradMove { from{background-position:0%} to{background-position:200%} }
+  .modal-desc { font-size: 0.73rem; color: var(--muted); line-height: 1.7; margin-bottom: 16px; }
+  .order-box { background: var(--s2); border: 1px dashed var(--border2); border-radius: 9px; padding: 12px; margin-bottom: 14px; }
+  .order-box-label { font-size: 0.58rem; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 5px; }
+  .order-id-val { font-family: 'Outfit', sans-serif; font-weight: 900; font-size: 1.05rem; letter-spacing: 2px; background: linear-gradient(90deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .modal-meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-bottom: 14px; }
+  .meta-box { background: var(--s2); border: 1px solid var(--border); border-radius: 8px; padding: 10px; text-align: left; }
+  .meta-box .ml { font-size: 0.57rem; color: var(--muted); letter-spacing: 0.8px; text-transform: uppercase; margin-bottom: 3px; }
+  .meta-box .mv { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 0.8rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .meta-box .mv.gold { color: var(--gold); }
+  .meta-box .mv.green { color: var(--green); }
+  .meta-box .mv.purple { color: var(--accent); }
+  .modal-gp-box { background: linear-gradient(135deg, rgba(124,92,252,0.08), rgba(252,92,125,0.05)); border: 1px solid rgba(124,92,252,0.25); border-radius: 9px; padding: 11px; margin-bottom: 14px; display: flex; align-items: center; gap: 10px; text-align: left; }
+  .modal-gp-emoji { font-size: 1.2rem; }
+  .modal-gp-info { flex: 1; min-width: 0; }
+  .modal-gp-title { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 0.78rem; margin-bottom: 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .modal-gp-id { font-size: 0.65rem; color: var(--muted); }
+  .modal-gp-status { background: rgba(57,217,138,0.1); border: 1px solid rgba(57,217,138,0.25); border-radius: 6px; padding: 2px 8px; font-size: 0.58rem; color: var(--green); flex-shrink: 0; }
+  .btn-wa { display: flex; align-items: center; justify-content: center; gap: 7px; width: 100%; background: #25d366; color: #fff; border: none; border-radius: 8px; padding: 11px; font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 0.78rem; cursor: pointer; margin-bottom: 8px; transition: all 0.2s; }
+  .btn-wa:hover { background: #1db857; transform: translateY(-1px); }
+  .btn-close { width: 100%; background: transparent; border: 1px solid var(--border); border-radius: 8px; padding: 10px; color: var(--muted); font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; cursor: pointer; transition: all 0.2s; }
+  .btn-close:hover { border-color: var(--border2); color: var(--text); }
+  .pay-action-box { background: var(--s2); border: 1px solid var(--border2); border-radius: 9px; padding: 12px; margin-bottom: 12px; text-align: center; }
+  .pay-action-label { font-size: 0.62rem; color: var(--muted); letter-spacing: 0.8px; text-transform: uppercase; margin-bottom: 7px; }
+  .pay-number { font-family: 'Outfit', sans-serif; font-weight: 900; font-size: 1.15rem; color: var(--text); letter-spacing: 1.5px; margin-bottom: 7px; }
+  .btn-copy { background: var(--accent); border: none; border-radius: 6px; padding: 7px 16px; color: #fff; font-size: 0.72rem; font-weight: 700; cursor: pointer; transition: all 0.2s; width: 100%; }
+  .btn-copy:hover { opacity: 0.85; }
+  .btn-copy.copied { background: var(--green); }
+  .qris-overlay { display: none; position: fixed; inset: 0; z-index: 99999; background: rgba(0,0,0,0.9); backdrop-filter: blur(12px); align-items: center; justify-content: center; }
+  .qris-overlay.show { display: flex; }
+  .qris-box { background: #fff; border-radius: 16px; padding: 24px; text-align: center; max-width: 300px; width: 90%; }
+  .qris-box h3 { color: #111; font-size: 1rem; margin-bottom: 4px; }
+  .qris-box p { color: #666; font-size: 0.75rem; margin-bottom: 16px; }
+  .qris-img { width: 100%; max-width: 260px; height: auto; margin: 0 auto 16px; display: block; border: 2px solid #eee; border-radius: 8px; }
+  .qris-amount { color: #111; font-weight: 900; font-size: 1.2rem; margin-bottom: 16px; }
+  .btn-qris-close { background: #7c5cfc; color: #fff; border: none; border-radius: 8px; padding: 10px 20px; font-weight: 700; font-size: 0.8rem; cursor: pointer; width: 100%; }
+  .upload-section { margin-bottom: 14px; }
+  .upload-label { font-size: 0.65rem; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; display: block; }
+  .upload-area { border: 2px dashed var(--border2); border-radius: 10px; padding: 16px; text-align: center; cursor: pointer; transition: all 0.2s; position: relative; }
+  .upload-area:hover { border-color: var(--accent); }
+  .upload-area input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; }
+  .upload-area .upload-icon { font-size: 1.5rem; margin-bottom: 6px; }
+  .upload-area .upload-text { font-size: 0.72rem; color: var(--muted); }
+  .upload-preview { display: none; margin-top: 8px; }
+  .upload-preview img { width: 100%; max-height: 120px; object-fit: cover; border-radius: 8px; }
+  .btn-submit-bukti { width: 100%; background: linear-gradient(135deg, var(--accent), var(--accent2)); border: none; border-radius: 9px; padding: 12px; color: #fff; font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 0.82rem; cursor: pointer; transition: all 0.2s; margin-bottom: 8px; }
+  .btn-submit-bukti:hover { opacity: 0.9; transform: translateY(-1px); }
+  .btn-submit-bukti:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+  .trust {
+    overflow: hidden; padding: 0 0 40px; position: relative;
+    pointer-events: none; user-select: none; touch-action: none;
+  }
+  .trust::before, .trust::after {
+    content: ''; position: absolute; top: 0; bottom: 40px; width: 40px; z-index: 2; pointer-events: none;
+  }
+  .trust::before { left: 0; background: linear-gradient(to right, var(--bg), transparent); }
+  .trust::after  { right: 0; background: linear-gradient(to left, var(--bg), transparent); }
+  .trust-track {
+    display: flex; align-items: center; gap: 10px;
+    width: max-content;
+    animation: trustScroll 24s linear infinite;
+    pointer-events: none; user-select: none;
+    will-change: transform;
+  }
+  @keyframes trustScroll {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+  .trust-item {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 0.63rem; color: var(--muted);
+    background: var(--s2); border: 1px solid var(--border);
+    border-radius: 20px; padding: 5px 12px;
+    white-space: nowrap; flex-shrink: 0;
+    pointer-events: none; user-select: none;
+  }
+  .trust-item .ti { font-size: 0.85rem; }
+  /* QRIS error state */
+  .qris-error { color: #cc4444; font-size: 0.75rem; margin-bottom: 12px; padding: 8px; background: #fff0f0; border-radius: 6px; }
+  .qris-placeholder { width: 200px; height: 200px; margin: 0 auto 16px; display: flex; align-items: center; justify-content: center; background: #f5f5f5; border: 2px dashed #ccc; border-radius: 8px; color: #999; font-size: 0.75rem; text-align: center; padding: 12px; }
+
+  /* ── PESANAN SAYA ── */
+  .my-orders-section { max-width: 960px; margin: 0 auto 28px; padding: 0 14px; display: none; }
+  .my-orders-section.show { display: block; animation: cardIn .4s ease both; }
+  .my-orders-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .my-orders-title { font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 0.95rem; display: flex; align-items: center; gap: 8px; }
+  .my-orders-count { background: rgba(124,92,252,.15); border: 1px solid rgba(124,92,252,.3); border-radius: 20px; padding: 2px 9px; font-size: 0.65rem; color: var(--accent); font-weight: 700; }
+  .my-orders-subtitle { font-size: 0.65rem; color: var(--muted); margin-top: 2px; }
+
+  /* Order card — baris ringkasan */
+  .order-card {
+    background: var(--s1);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 8px;
+    overflow: hidden;
+    transition: border-color .2s, box-shadow .2s;
+    cursor: pointer;
+  }
+  .order-card:hover { border-color: rgba(124,92,252,.35); box-shadow: 0 4px 20px rgba(0,0,0,.3); }
+  .order-card.expanded { border-color: rgba(124,92,252,.4); }
+
+  .order-card-summary {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    min-width: 0;
+    overflow: hidden;
+  }
+  .order-card-icon { width: 38px; height: 38px; border-radius: 10px; background: linear-gradient(135deg, rgba(124,92,252,.15), rgba(252,92,125,.1)); border: 1px solid rgba(124,92,252,.2); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
+  .order-card-info { flex: 1; min-width: 0; }
+  .order-card-id { font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; color: var(--accent); margin-bottom: 2px; }
+  .order-card-main { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 0.88rem; color: var(--text); }
+  .order-card-sub { font-size: 0.62rem; color: var(--muted); margin-top: 2px; }
+  .order-card-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0; max-width: 110px; }
+  .order-card-price { font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 0.85rem; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+  .order-card-chevron { font-size: 0.65rem; color: var(--muted); transition: transform .25s; }
+  .order-card.expanded .order-card-chevron { transform: rotate(180deg); }
+
+  /* Status chip */
+  .order-status { display: inline-flex; align-items: center; gap: 3px; border-radius: 20px; padding: 2px 7px; font-size: 0.52rem; font-weight: 700; letter-spacing: .03em; text-transform: uppercase; white-space: nowrap; max-width: 100%; }
+  .order-status.pending { background: rgba(255,200,87,.1); border: 1px solid rgba(255,200,87,.3); color: var(--gold); }
+  .order-status.bukti_masuk { background: rgba(124,92,252,.1); border: 1px solid rgba(124,92,252,.3); color: var(--accent); }
+  .order-status.success { background: rgba(57,217,138,.1); border: 1px solid rgba(57,217,138,.3); color: var(--green); }
+  .order-status.failed { background: rgba(252,92,125,.1); border: 1px solid rgba(252,92,125,.3); color: var(--accent2); }
+
+  /* Detail expand panel */
+  .order-detail {
+    display: none;
+    border-top: 1px solid var(--border);
+    padding: 14px;
+    background: var(--s2);
+    animation: fadeIn .2s ease;
+  }
+  .order-card.expanded .order-detail { display: block; }
+
+  .order-detail-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  @media(max-width:480px) { .order-detail-grid { grid-template-columns: repeat(2,1fr); } }
+
+  .od-box { background: var(--s3); border: 1px solid var(--border); border-radius: 8px; padding: 9px 11px; }
+  .od-label { font-size: 0.55rem; color: var(--muted); text-transform: uppercase; letter-spacing: .8px; margin-bottom: 3px; }
+  .od-val { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 0.78rem; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .od-val.gold { color: var(--gold); }
+  .od-val.green { color: var(--green); }
+  .od-val.purple { color: var(--accent); }
+
+  /* Bukti section dalam detail */
+  .order-bukti-section { }
+  .order-bukti-label { font-size: 0.62rem; color: var(--muted); text-transform: uppercase; letter-spacing: .8px; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+  .order-bukti-label span { flex: 1; height: 1px; background: var(--border); display: block; }
+
+  .bukti-preview-thumb {
+    width: 100%;
+    max-height: 100px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid var(--border2);
+    margin-bottom: 10px;
+    cursor: zoom-in;
+  }
+
+  .btn-kirim-bukti {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    width: 100%;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none;
+    border-radius: 8px;
+    padding: 11px;
+    color: #fff;
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all .2s;
+    letter-spacing: .2px;
+  }
+  .btn-kirim-bukti:hover { opacity: .88; transform: translateY(-1px); box-shadow: 0 5px 16px rgba(124,92,252,.3); }
+  .btn-kirim-bukti.done {
+    background: rgba(57,217,138,.12);
+    border: 1px solid rgba(57,217,138,.3);
+    color: var(--green);
+    cursor: default;
+    transform: none;
+    box-shadow: none;
+  }
+  .btn-update-bukti {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    width: 100%;
+    background: transparent;
+    border: 1px solid rgba(124,92,252,.4);
+    border-radius: 8px;
+    padding: 10px;
+    color: var(--accent);
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .2s;
+    margin-top: 7px;
+  }
+  .btn-update-bukti:hover { background: rgba(124,92,252,.08); }
+
+  .my-orders-empty { text-align: center; padding: 28px; color: var(--muted); font-size: 0.78rem; background: var(--s1); border: 1px dashed var(--border); border-radius: 12px; }
+  .my-orders-empty .empty-icon { font-size: 2rem; margin-bottom: 8px; display: block; }
+  .my-orders-empty p { font-size: 0.7rem; color: var(--muted); margin-top: 4px; }
+
+  /* mobile safe */
+  @media(max-width:480px) {
+    .order-card-right { align-items: flex-end; }
+  }
+
+  /* Bukti image lightbox */
+  .bukti-lightbox { display: none; position: fixed; inset: 0; z-index: 99999; background: rgba(0,0,0,.95); align-items: center; justify-content: center; cursor: zoom-out; }
+  .bukti-lightbox.show { display: flex; }
+  .bukti-lightbox img { max-width: 92vw; max-height: 88vh; border-radius: 10px; object-fit: contain; }
+
+  /* ══════════════════════════════════════════════
+     MOBILE IMPROVEMENTS — comprehensive overhaul
+  ══════════════════════════════════════════════ */
+
+  /* Sticky bottom order bar (mobile only) */
+  .mobile-order-bar {
+    display: none;
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: rgba(10, 10, 16, 0.97);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid var(--border2);
+    padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px));
+    z-index: 400;
+    box-shadow: 0 -8px 32px rgba(0,0,0,0.55);
+  }
+  .mob-bar-inner {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .mob-bar-info {
+    flex: 1;
+    min-width: 0;
+  }
+  .mob-bar-robux {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 900;
+    font-size: 1.1rem;
+    letter-spacing: -0.5px;
+    background: linear-gradient(90deg, var(--gold), #ffa040);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    line-height: 1.1;
+  }
+  .mob-bar-price {
+    font-size: 0.7rem;
+    color: var(--muted);
+    margin-top: 1px;
+  }
+  .mob-bar-price strong { color: var(--green); }
+  .mob-bar-btn {
+    flex-shrink: 0;
+    background: linear-gradient(135deg, var(--accent) 0%, #5b3de8 50%, var(--accent2) 100%);
+    background-size: 200% 200%;
+    animation: gradShift 4s ease infinite;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 12px 20px;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 800;
+    font-size: 0.82rem;
+    letter-spacing: 0.3px;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .mob-bar-btn:disabled {
+    background: var(--s2);
+    color: var(--muted);
+    animation: none;
+    cursor: not-allowed;
+    border: 1px solid var(--border);
+  }
+  .mob-bar-btn:not(:disabled):active { transform: scale(0.97); }
+
+  @media (max-width: 720px) {
+    /* ── Global: prevent all horizontal overflow ── */
+    * { max-width: 100%; }
+    input, textarea, select { max-width: 100%; box-sizing: border-box; }
+
+    /* Show mobile bar */
+    .mobile-order-bar { display: block; }
+
+    /* Body padding for sticky bar */
+    body { padding-bottom: 80px; }
+
+    /* Header: tighter, admin jadi icon only, hide live badge */
+    header { padding: 10px 14px; gap: 6px; }
+    .logo-text { font-size: 0.95rem; }
+    .admin-label { display: none; }
+    .live-badge { display: none; }
+    .btn-admin { padding: 6px 9px !important; font-size: 14px !important; }
+
+    /* Hero: compact, no overflow */
+    .hero { padding: 20px 16px 12px; }
+    .hero h1 { font-size: clamp(1.5rem, 7vw, 2.2rem); letter-spacing: -1px; margin-bottom: 8px; }
+    .hero p { font-size: 0.75rem; }
+    .hero-eyebrow { font-size: 0.58rem; padding: 4px 12px; margin-bottom: 10px; }
+
+    /* How-steps: 2x2 grid on mobile, no scroll needed */
+    .how-section { padding: 0 12px; margin-bottom: 12px; }
+    .how-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      overflow: visible;
+    }
+    .how-step { padding: 12px 10px; }
+    .how-icon { font-size: 1.1rem; margin-bottom: 5px; }
+    .how-title { font-size: 0.7rem; }
+    .how-desc { font-size: 0.6rem; }
+
+    /* Main: single column */
+    .main { grid-template-columns: 1fr; padding: 0 12px 20px; gap: 0; }
+
+    /* Hide entire sidebar column on mobile */
+    .main > div:last-child { display: none; }
+
+    /* Cards */
+    .card { padding: 14px 12px; margin-bottom: 8px; border-radius: 14px; }
+    .card-head { margin-bottom: 12px; gap: 9px; }
+    .card-head-icon { width: 30px; height: 30px; font-size: 0.9rem; border-radius: 8px; }
+    .card-head-title { font-size: 0.82rem; }
+    .card-head-sub { font-size: 0.6rem; }
+
+    /* Package grid: 3-col on mobile */
+    .pkg-grid { grid-template-columns: repeat(3, 1fr); gap: 7px; }
+    .pkg { padding: 11px 6px; border-radius: 10px; touch-action: manipulation; }
+    .pkg-emoji { font-size: 1.2rem; margin-bottom: 5px; }
+    .pkg-amount { font-size: 0.82rem; }
+    .pkg-price { font-size: 0.64rem; }
+    .pkg.hot .hot-tag { font-size: 0.46rem; padding: 2px 8px; }
+
+    /* Gamepass guide */
+    .gamepass-guide { padding: 10px; }
+    .gp-guide-title { font-size: 0.72rem; margin-bottom: 7px; }
+    .gp-step { font-size: 0.66rem; gap: 7px; }
+    .gp-step-num { width: 17px; height: 17px; font-size: 0.52rem; flex-shrink: 0; }
+
+    /* Gamepass URL row: stack */
+    .gp-url-row { flex-direction: column; gap: 6px; }
+    .btn-extract { width: 100%; padding: 10px; text-align: center; font-size: 0.72rem; }
+    .gp-url-row input { font-size: 0.75rem; padding: 10px 11px; }
+    .gp-id-input { font-size: 0.8rem; padding: 10px 11px; }
+
+    /* Input fields */
+    .input-wrap input { padding: 12px; font-size: 0.85rem; }
+    .field { margin-bottom: 14px; }
+    .field label { font-size: 0.62rem; margin-bottom: 7px; }
+    .input-hint { font-size: 0.62rem; }
+
+    /* Payment methods */
+    .pay-grid { grid-template-columns: repeat(3, 1fr); gap: 6px; }
+    .pay-btn { padding: 12px 6px; touch-action: manipulation; }
+    .pay-icon { font-size: 1.2rem; margin-bottom: 5px; }
+    .pay-name { font-size: 0.66rem; }
+
+    /* pend-box fix */
+    .pend-box { font-size: 0.68rem; line-height: 1.5; }
+
+    /* Modal: bottom sheet */
+    .modal-overlay { padding: 0; align-items: flex-end; }
+    .modal {
+      display: flex; flex-direction: column;
+      border-radius: 20px 20px 0 0;
+      max-width: 100%; max-height: 92vh;
+      padding: 0 16px 20px;
+      overflow-y: auto; -webkit-overflow-scrolling: touch;
+    }
+    .modal::before { border-radius: 20px 20px 0 0; }
+    .modal::after {
+      content: ''; display: block;
+      width: 36px; height: 4px;
+      background: var(--border2); border-radius: 2px;
+      margin: 10px auto 14px; order: 0; flex-shrink: 0;
+    }
+    .modal > * { order: 1; }
+    .modal h2 { font-size: 1rem; }
+    .modal-desc { font-size: 0.7rem; }
+    .modal-meta-grid { grid-template-columns: 1fr 1fr; }
+    .meta-box .mv { font-size: 0.75rem; }
+
+    /* My orders section */
+    .my-orders-section { padding: 0 12px; margin-bottom: 20px; }
+    .my-orders-title { font-size: 0.88rem; }
+    .order-card-main { font-size: 0.82rem; }
+    .order-card-price { font-size: 0.85rem; }
+    .order-detail-grid { grid-template-columns: repeat(2, 1fr); gap: 7px; }
+
+    /* Trust bar: marquee, no override needed */
+    .trust { padding: 0 0 20px; }
+
+    /* QRIS */
+    .qris-box { padding: 20px 16px; }
+    .qris-box h3 { font-size: 0.95rem; }
+    .qris-img { max-width: 220px; }
+  }
+
+  @media (max-width: 400px) {
+    .pkg-grid { grid-template-columns: repeat(3, 1fr); gap: 5px; }
+    .pkg { padding: 10px 4px; }
+    .pkg-amount { font-size: 0.76rem; }
+    .pkg-price { font-size: 0.6rem; }
+    .pkg-emoji { font-size: 1.1rem; }
+  }
+</style>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iZyIgeDE9IjAlIiB5MT0iMCUiIHgyPSIxMDAlIiB5Mj0iMTAwJSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiNhODU1ZjciLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjNjM2NmYxIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8cmVjdCB4PSI4IiB5PSI4IiB3aWR0aD0iODQiIGhlaWdodD0iODQiIHJ4PSIxNCIgcnk9IjE0IiBmaWxsPSJ1cmwoI2cpIiB0cmFuc2Zvcm09InJvdGF0ZSgxMCA1MCA1MCkiLz4KICA8dGV4dCB4PSI1MCIgeT0iNzIiIGZvbnQtZmFtaWx5PSJBcmlhbCBCbGFjayxzYW5zLXNlcmlmIiBmb250LXNpemU9IjY0IiBmb250LXdlaWdodD0iOTAwIiBmaWxsPSJ3aGl0ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+SzwvdGV4dD4KPC9zdmc+">
+</head>
+<body>
+<div class="bg-fx"></div>
+<div class="grid-fx"></div>
+<div class="wrapper">
+
+  <header>
+    <div class="logo">
+      <div style="background:#1a1a2a;border-radius:9px;width:30px;height:30px;box-shadow:0 2px 8px rgba(0,0,0,0.6);flex-shrink:0;display:flex;align-items:center;justify-content:center;">
+        <svg width="16" height="16" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <g transform="rotate(-12 10 10)">
+            <rect x="2" y="2" width="16" height="16" rx="4" fill="none" stroke="white" stroke-width="2.2"/>
+            <rect x="6.5" y="6.5" width="7" height="7" rx="2" fill="none" stroke="white" stroke-width="2"/>
+          </g>
+        </svg>
+      </div>
+            <div class="logo-text">Koko<em>r</em><em>bx</em></div>
+    </div>
+    <div class="header-right">
+      <div id="user-bar" style="display:none;align-items:center;gap:8px;">
+        <span id="user-bar-name" style="font-size:12px;color:#aaa;font-weight:600;"></span>
+        <button onclick="logoutStore()" style="background:rgba(255,80,80,.12);border:1px solid rgba(255,80,80,.3);border-radius:7px;padding:5px 10px;color:#ff6060;font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap;">Keluar</button>
+      </div>
+      <div id="login-bar" style="display:none;">
+        <a href="rbxstore_auth.html" style="background:rgba(124,92,252,.15);border:1px solid rgba(124,92,252,.4);border-radius:7px;padding:5px 11px;color:var(--accent);font-size:11px;font-weight:600;text-decoration:none;white-space:nowrap;">🔑 Masuk</a>
+      </div>
+      <a href="admin.html" class="btn-admin" style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:7px;padding:5px 10px;color:#aaa;font-size:11px;font-weight:600;text-decoration:none;white-space:nowrap;">⚙ <span class="admin-label">Admin</span></a>
+      <div class="live-badge">
+        <div class="live-dot"></div>
+        Online 24/7
+      </div>
+    </div>
+  </header>
+
+  <div class="hero">
+    <div class="hero-eyebrow">🎮 Sistem Gamepass</div>
+    <h1>Top Up <span class="g2">Robux</span><br>via <span class="g1">Gamepass</span></h1>
+    <p>Kirim ID gamepass kamu → kami beli → Robux masuk otomatis. Cara paling aman tanpa perlu login akun.</p>
+  </div>
+
+  <div class="how-section">
+    <div class="how-grid">
+      <div class="how-step"><div class="how-num">1</div><span class="how-icon">🛒</span><div class="how-title">Buat Gamepass</div><div class="how-desc">Buat gamepass di Roblox Studio dengan harga sesuai Robux yang kamu inginkan</div></div>
+      <div class="how-step"><div class="how-num">2</div><span class="how-icon">🔗</span><div class="how-title">Kirim ID</div><div class="how-desc">Masukkan link atau ID gamepass ke form di bawah, kami akan verifikasi</div></div>
+      <div class="how-step"><div class="how-num">3</div><span class="how-icon">💸</span><div class="how-title">Bayar ke Kami</div><div class="how-desc">Lakukan pembayaran sesuai paket. Kami akan membeli gamepass dari akunmu</div></div>
+      <div class="how-step"><div class="how-num">4</div><span class="how-icon">💎</span><div class="how-title">Robux Masuk!</div><div class="how-desc">Robux langsung masuk ke akun Roblox kamu dalam 5 hari</div></div>
+    </div>
+  </div>
+
+  <div class="main">
+    <div>
+      <div class="card">
+        <div class="card-head">
+          <div class="card-head-icon">💰</div>
+          <div class="card-head-text">
+            <div class="card-head-title">Pilih Jumlah Robux</div>
+            <div class="card-head-sub">Harga gamepass harus sesuai jumlah yang dipilih</div>
+          </div>
+        </div>
+        <div class="pkg-grid">
+          <div class="pkg" onclick="selectPkg(this,100,12000)"><span class="pkg-emoji">🪙</span><div class="pkg-amount">100 R$</div><div class="pkg-price">Rp 12.000</div></div>
+          <div class="pkg" onclick="selectPkg(this,200,24000)"><span class="pkg-emoji">🪙</span><div class="pkg-amount">200 R$</div><div class="pkg-price">Rp 24.000</div></div>
+          <div class="pkg" onclick="selectPkg(this,300,36000)"><span class="pkg-emoji">🪙</span><div class="pkg-amount">300 R$</div><div class="pkg-price">Rp 36.000</div></div>
+          <div class="pkg" onclick="selectPkg(this,400,48000)"><span class="pkg-emoji">💰</span><div class="pkg-amount">400 R$</div><div class="pkg-price">Rp 48.000</div></div>
+          <div class="pkg hot" onclick="selectPkg(this,500,60000)"><div class="hot-tag">POPULER</div><span class="pkg-emoji" style="margin-top:10px">💰</span><div class="pkg-amount">500 R$</div><div class="pkg-price">Rp 60.000</div></div>
+          <div class="pkg" onclick="selectPkg(this,600,72000)"><span class="pkg-emoji">💎</span><div class="pkg-amount">600 R$</div><div class="pkg-price">Rp 72.000</div></div>
+          <div class="pkg" onclick="selectPkg(this,700,84000)"><span class="pkg-emoji">💎</span><div class="pkg-amount">700 R$</div><div class="pkg-price">Rp 84.000</div></div>
+          <div class="pkg" onclick="selectPkg(this,800,96000)"><span class="pkg-emoji">💎</span><div class="pkg-amount">800 R$</div><div class="pkg-price">Rp 96.000</div></div>
+          <div class="pkg" onclick="selectPkg(this,900,108000)"><span class="pkg-emoji">🏆</span><div class="pkg-amount">900 R$</div><div class="pkg-price">Rp 108.000</div></div>
+          <div class="pkg" onclick="selectPkg(this,1000,120000)"><span class="pkg-emoji">👑</span><div class="pkg-amount">1.000 R$</div><div class="pkg-price">Rp 120.000</div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div class="card-head-icon">🎫</div>
+          <div class="card-head-text">
+            <div class="card-head-title">ID Gamepass Kamu</div>
+            <div class="card-head-sub">Buat gamepass dengan harga sesuai paket yang dipilih</div>
+          </div>
+        </div>
+        <div class="gamepass-guide">
+          <div class="gp-guide-title">📖 Cara Membuat Gamepass</div>
+          <div class="gp-steps">
+            <div class="gp-step"><div class="gp-step-num">1</div><div>Buka <strong>Roblox Studio</strong> → pilih game kamu → klik tab <strong>View</strong> → <strong>Game Explorer</strong></div></div>
+            <div class="gp-step"><div class="gp-step-num">2</div><div>Klik kanan <strong>Game Passes</strong> → <strong>Add Game Pass</strong>, beri nama bebas</div></div>
+            <div class="gp-step"><div class="gp-step-num">3</div><div>Set harga gamepass sesuai paket yang dipilih (misal 450 R$ untuk paket 450 R$)</div></div>
+            <div class="gp-step"><div class="gp-step-num">4</div><div>Salin link gamepass atau ID-nya (angka di URL), lalu paste di bawah</div></div>
+          </div>
+        </div>
+        <div class="gp-input-box">
+          <div class="gp-url-row">
+            <input type="text" id="gp-url" placeholder="https://www.roblox.com/game-pass/123456789/..." oninput="parseGamepassUrl()">
+            <button class="btn-extract" onclick="extractAndVerify()">Verifikasi</button>
+          </div>
+          <div class="gp-divider">ATAU masukkan ID langsung</div>
+          <input type="text" class="gp-id-input" id="gp-id" placeholder="Contoh: 123456789" oninput="onIdInput()">
+          <div class="gp-preview" id="gp-preview">
+            <div class="gp-prev-icon">🎫</div>
+            <div class="gp-prev-info">
+              <div class="gp-prev-name" id="gp-prev-name">Top Up Package</div>
+              <div class="gp-prev-id">ID: <span id="gp-prev-id-val">—</span></div>
+              <div class="gp-prev-badge"><span>✓</span> Gamepass terdeteksi</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div class="card-head-icon">👤</div>
+          <div class="card-head-text">
+            <div class="card-head-title">Data Akun</div>
+            <div class="card-head-sub">Verifikasi pemilik gamepass</div>
+          </div>
+        </div>
+        <div class="field">
+          <label>Username Roblox <span class="req">*</span></label>
+          <div class="input-wrap">
+            <input type="text" id="username" placeholder="Username akun pemilik gamepass..." oninput="updateSummary()">
+          </div>
+          <div class="input-hint">⚠️ Harus sama dengan pemilik gamepass yang dibuat</div>
+        </div>
+        <div class="field">
+          <label>Email <span class="req">*</span></label>
+          <div class="input-wrap">
+            <input type="email" id="contact" placeholder="email@kamu.com (untuk notifikasi order)..." oninput="updateSummary()">
+          </div>
+          <div class="input-hint">📧 Notifikasi status order akan dikirim ke email ini</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div class="card-head-icon">💳</div>
+          <div class="card-head-text">
+            <div class="card-head-title">Metode Pembayaran</div>
+            <div class="card-head-sub">Bayar ke kami, kami beli gamepass kamu</div>
+          </div>
+        </div>
+        <div class="pay-grid">
+          <div class="pay-btn" onclick="selectPay(this,'DANA')"><span class="pay-icon">🔵</span><div class="pay-name">DANA</div></div>
+          <div class="pay-btn" onclick="selectPay(this,'GoPay')"><span class="pay-icon">🟢</span><div class="pay-name">GoPay</div></div>
+          <div class="pay-btn" onclick="selectPay(this,'QRIS')"><span class="pay-icon">📱</span><div class="pay-name">QRIS</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="summary">
+        <div class="sum-head">📋 Ringkasan Order</div>
+        <div class="rbx-display">
+          <div class="rbx-big" id="sum-rbx">— R$</div>
+          <div class="rbx-sub">Robux yang akan kamu terima</div>
+        </div>
+        <div class="gp-sum-box">
+          <div class="gp-sum-icon">🎫</div>
+          <div class="gp-sum-info">
+            <div class="gp-sum-label">ID Gamepass</div>
+            <div class="gp-sum-val empty" id="sum-gpid">Belum diisi</div>
+          </div>
+        </div>
+        <div class="pend-box">⏳ Robux masuk <strong>5 hari</strong> setelah pembayaran. Status: <strong>PENDING</strong></div>
+        <div class="sum-row"><span class="k">Paket</span><span class="v" id="sum-pkg">—</span></div>
+        <div class="sum-row"><span class="k">Username</span><span class="v" id="sum-user">—</span></div>
+        <div class="sum-row"><span class="k">Metode Bayar</span><span class="v" id="sum-pay">—</span></div>
+        <div class="sum-row"><span class="k">Biaya Admin</span><span class="v">Rp 0</span></div>
+        <div class="sum-divider"></div>
+        <div class="sum-total"><span class="k">Total Bayar</span><span class="v" id="sum-total">Rp —</span></div>
+        <button class="btn-order" id="btn-order" onclick="placeOrder()" disabled>🚀 ORDER SEKARANG</button>
+        <div class="sum-footnote">🔒 Transaksi aman & terenkripsi<br>Tanpa login akun Roblox kamu</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PESANAN SAYA -->
+  <div class="my-orders-section" id="my-orders-section">
+    <div class="my-orders-header">
+      <div>
+        <div class="my-orders-title">📦 Pesanan Saya <span class="my-orders-count" id="my-orders-count">0</span></div>
+        <div class="my-orders-subtitle">Klik pesanan untuk lihat detail & kirim bukti pembayaran</div>
+      </div>
+    </div>
+    <div id="my-orders-list"></div>
+  </div>
+
+  <!-- LIGHTBOX BUKTI -->
+  <div class="bukti-lightbox" id="bukti-lightbox" onclick="closeLightbox()">
+    <img id="bukti-lightbox-img" src="" alt="Bukti Pembayaran">
+  </div>
+
+  <div class="trust">
+    <div class="trust-track">
+      <div class="trust-item"><span class="ti">🔐</span> Tanpa Password</div>
+      <div class="trust-item"><span class="ti">⚡</span> 5 hari</div>
+      <div class="trust-item"><span class="ti">✅</span> 50K+ Transaksi</div>
+      <div class="trust-item"><span class="ti">🕐</span> 24/7 Online</div>
+      <div class="trust-item"><span class="ti">💯</span> Garansi Aman</div>
+      <!-- duplicate for seamless loop -->
+      <div class="trust-item"><span class="ti">🔐</span> Tanpa Password</div>
+      <div class="trust-item"><span class="ti">⚡</span> 5 hari</div>
+      <div class="trust-item"><span class="ti">✅</span> 50K+ Transaksi</div>
+      <div class="trust-item"><span class="ti">🕐</span> 24/7 Online</div>
+      <div class="trust-item"><span class="ti">💯</span> Garansi Aman</div>
+    </div>
+  </div>
+</div>
+
+<!-- MOBILE STICKY ORDER BAR -->
+<div class="mobile-order-bar" id="mobile-order-bar">
+  <div class="mob-bar-inner">
+    <div class="mob-bar-info">
+      <div class="mob-bar-robux" id="mob-bar-robux">Pilih paket</div>
+      <div class="mob-bar-price" id="mob-bar-price">Belum ada paket dipilih</div>
+    </div>
+    <button class="mob-bar-btn" id="mob-bar-btn" onclick="placeOrder()" disabled>🚀 ORDER</button>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal" onclick="closeOutside(event)">
+  <div class="modal">
+    <span class="modal-icon-big">⏳</span>
+    <h2>Order Diterima!</h2>
+    <div class="status-chip"><div class="live-dot"></div>PENDING — Diproses</div>
+    <div class="modal-progress"><div class="modal-progress-fill"></div></div>
+    <p class="modal-desc">Pesanan kamu sedang <strong>diverifikasi</strong>. Setelah pembayaran dikonfirmasi, kami akan membeli gamepass kamu dan Robux akan masuk dalam <strong>5 hari</strong>.</p>
+    <div class="order-box">
+      <div class="order-box-label">Nomor Order</div>
+      <div class="order-id-val" id="modal-oid">RBX-000000</div>
+    </div>
+    <div class="modal-gp-box">
+      <div class="modal-gp-emoji">🎫</div>
+      <div class="modal-gp-info">
+        <div class="modal-gp-title" id="modal-gp-name">Gamepass</div>
+        <div class="modal-gp-id">ID: <span id="modal-gp-id">—</span></div>
+      </div>
+      <div class="modal-gp-status">✓ Verified</div>
+    </div>
+    <div class="modal-meta-grid">
+      <div class="meta-box"><div class="ml">Robux</div><div class="mv gold" id="modal-rbx">—</div></div>
+      <div class="meta-box"><div class="ml">Total Bayar</div><div class="mv green" id="modal-total">—</div></div>
+      <div class="meta-box"><div class="ml">Username</div><div class="mv purple" id="modal-user">—</div></div>
+      <div class="meta-box"><div class="ml">Pembayaran</div><div class="mv" id="modal-pay">—</div></div>
+    </div>
+    <div id="pay-action-area"></div>
+    <button class="btn-close" onclick="closeModal()">Tutup</button>
+
+  </div>
+</div>
+
+<!-- QRIS POPUP -->
+<div class="qris-overlay" id="qris-overlay" onclick="closeQris(event)">
+  <div class="qris-box">
+    <h3>💳 Bayar via QRIS</h3>
+    <p>Scan QR code dengan GoPay / OVO / DANA / m-Banking</p>
+    <div id="qris-content"><!-- diisi JS --></div>
+    <div class="qris-amount" id="qris-amount"></div>
+    <button class="btn-qris-close" onclick="document.getElementById('qris-overlay').classList.remove('show')">✕ Tutup</button>
+  </div>
+</div>
+
+<!-- MODAL UPLOAD BUKTI (dari Pesanan Saya) -->
+<div class="modal-overlay" id="modal-bukti" onclick="if(event.target===this)closeBuktiModal()">
+  <div class="modal" style="text-align:left;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+      <div>
+        <div style="font-family:'Outfit',sans-serif;font-weight:800;font-size:1rem;">📤 Kirim Bukti Transfer</div>
+        <div style="font-size:0.7rem;color:var(--muted);margin-top:2px;" id="bukti-modal-oid"></div>
+      </div>
+      <button onclick="closeBuktiModal()" style="background:rgba(255,255,255,.07);border:1px solid var(--border);border-radius:8px;padding:5px 10px;color:var(--muted);cursor:pointer;font-size:12px;">✕</button>
+    </div>
+    <div id="bukti-modal-info" style="background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:16px;font-size:0.78rem;"></div>
+    <div style="font-size:0.65rem;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;">Foto Bukti Transfer</div>
+    <input type="file" id="bukti-modal-file" accept="image/*" style="display:none" onchange="handleBuktiFile(this)">
+    <div id="bukti-modal-zone" style="border:2px dashed var(--border2);border-radius:10px;padding:24px;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:8px;" onclick="document.getElementById('bukti-modal-file').click()" ondragover="event.preventDefault();this.style.borderColor='var(--accent)'" ondragleave="this.style.borderColor=''" ondrop="handleBuktiDrop(event)">
+      <div id="bukti-modal-placeholder">
+        <div style="font-size:1.8rem;margin-bottom:8px;">🖼️</div>
+        <div style="font-size:0.75rem;color:var(--muted);">Klik atau drag foto bukti pembayaran</div>
+        <div style="font-size:0.65rem;color:var(--muted);margin-top:4px;">JPG, PNG, WEBP</div>
+      </div>
+    </div>
+    <img id="bukti-modal-preview" src="" alt="" style="display:none;width:100%;max-height:200px;object-fit:contain;border-radius:10px;border:1px solid var(--border2);margin-bottom:12px;cursor:pointer;" onclick="document.getElementById('bukti-modal-file').click()">
+    <button id="bukti-modal-btn" onclick="submitBuktiModal()" disabled style="width:100%;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:9px;padding:13px;color:#fff;font-family:'Outfit',sans-serif;font-weight:700;font-size:0.85rem;cursor:pointer;transition:all .2s;opacity:.5;">📤 Kirim Bukti Pembayaran</button>
+  </div>
+</div>
+
+<script>
+  let _rbx = 0, _price = 0, _pkg = '', _pay = '', _gpId = '', _gpVerified = false;
+
+  // ============================================================
+  // GANTI INI SESUAI DATA KAMU
+  // ============================================================
+  const PAYMENT_NUMBERS = {
+    'DANA':  '081996112019',   // ← nomor DANA kamu
+    'GoPay': '081996112019',   // ← nomor GoPay kamu
+  };
+  // Upload foto QRIS ke imgur.com lalu paste URL-nya di sini:
+  // Contoh: 'https://i.imgur.com/AbCdEfG.png'
+  const QRIS_URL = 'https://i.imgur.com/GNkyXuY.jpg';   // QRIS
+
+  const BACKEND_URL = 'https://chisatobobaaaa.vercel.app';
+  const BOT_TOKEN   = '8991295561:AAEeb0gSUA-elsZ73nyiI1WeKTSK5JED4yc';
+  const CHAT_ID     = '7809292064';
+  // ============================================================
+
+  // ── SUPABASE CONFIG ──────────────────────────────────────────
+  const SUPA_URL = 'https://ddsvmskrbebblktsawxi.supabase.co';
+  const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRkc3Ztc2tyYmViYmxrdHNhd3hpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk0NTY0MDMsImV4cCI6MjA5NTAzMjQwM30.dqCrn61TQoWc-AmAT7VI33j_fh810m89eHKBnpAmH2w';
+  const SUPA_H   = { 'Content-Type':'application/json', 'apikey':SUPA_KEY, 'Authorization':'Bearer '+SUPA_KEY, 'Prefer':'return=representation' };
+
+  async function sbInsertOrder(order) {
+    try {
+      const payload = {
+        id:         order.id,
+        username:   order.username,
+        gp_id:      order.gpId || '',
+        robux:      Number(order.robux) || 0,
+        price:      Number(order.price) || 0,
+        method:     order.method || '',
+        status:     'pending',
+        email:      order.email || '',
+        has_proof:  false,
+        proof_viewed: false,
+        created_at: new Date().toISOString()
+      };
+      const res = await fetch(SUPA_URL + '/rest/v1/orders', {
+        method: 'POST',
+        headers: SUPA_H,
+        body: JSON.stringify(payload)
+      });
+      if (!res.ok) console.warn('[Supabase] insert order gagal:', await res.text());
+    } catch(e) { console.warn('[Supabase] insert order error:', e); }
+  }
+
+  async function sbUpdateOrderStatus(oid, patch) {
+    try {
+      await fetch(SUPA_URL + '/rest/v1/orders?id=eq.' + encodeURIComponent(oid), {
+        method: 'PATCH',
+        headers: { ...SUPA_H, 'Prefer':'return=minimal' },
+        body: JSON.stringify(patch)
+      });
+    } catch(e) { console.warn('[Supabase] update error:', e); }
+  }
+
+  async function sbGetMyOrders(username) {
+    try {
+      const res = await fetch(
+        SUPA_URL + '/rest/v1/orders?username=eq.' + encodeURIComponent(username) + '&order=created_at.desc',
+        { headers: SUPA_H }
+      );
+      if (!res.ok) return null;
+      return await res.json();
+    } catch(e) { return null; }
+  }
+
+  // Upload bukti ke Supabase Storage → kembalikan public URL
+  async function sbUploadBukti(orderId, base64Data) {
+    try {
+      // Konversi base64 → Blob
+      const [meta, b64] = base64Data.split(',');
+      const mime = (meta.match(/:(.*?);/) || ['','image/jpeg'])[1];
+      const ext  = mime.includes('png') ? 'png' : 'jpg';
+      const binary = atob(b64);
+      const arr = new Uint8Array(binary.length);
+      for (let i = 0; i < binary.length; i++) arr[i] = binary.charCodeAt(i);
+      const blob = new Blob([arr], { type: mime });
+
+      const filePath = 'bukti/' + orderId + '_' + Date.now() + '.' + ext;
+
+      const res = await fetch(
+        SUPA_URL + '/storage/v1/object/proofs/' + filePath,
+        {
+          method: 'POST',
+          headers: {
+            'apikey': SUPA_KEY,
+            'Authorization': 'Bearer ' + SUPA_KEY,
+            'Content-Type': mime,
+            'x-upsert': 'true'
+          },
+          body: blob
+        }
+      );
+
+      if (!res.ok) {
+        console.warn('[Supabase Storage] upload gagal:', await res.text());
+        return null;
+      }
+
+      // Public URL
+      const publicUrl = SUPA_URL + '/storage/v1/object/public/proofs/' + filePath;
+      return publicUrl;
+    } catch(e) {
+      console.warn('[Supabase Storage] upload error:', e);
+      return null;
+    }
+  }
+  // ── END SUPABASE ─────────────────────────────────────────────
+
+  function selectPkg(el, rbx, price) {
+    document.querySelectorAll('.pkg').forEach(p => p.classList.remove('selected'));
+    el.classList.add('selected');
+    _rbx = rbx; _price = price;
+    _pkg = rbx.toLocaleString('id') + ' R$';
+    updateSummary();
+  }
+
+  function selectPay(el, method) {
+    document.querySelectorAll('.pay-btn').forEach(p => p.classList.remove('selected'));
+    el.classList.add('selected');
+    _pay = method;
+    updateSummary();
+
+    // Highlight saja — QR & nomor muncul di modal order setelah checkout
+  }
+
+  // Toast notif kecil di bawah payment grid
+  function showPayToast(method, num) {
+    let toast = document.getElementById('pay-toast');
+    if (!toast) {
+      toast = document.createElement('div');
+      toast.id = 'pay-toast';
+      toast.style.cssText = [
+        'margin-top:10px',
+        'background:rgba(57,217,138,0.1)',
+        'border:1px solid rgba(57,217,138,0.3)',
+        'border-radius:9px',
+        'padding:10px 14px',
+        'font-size:0.72rem',
+        'color:#39d98a',
+        'display:flex',
+        'align-items:center',
+        'gap:8px',
+        'animation:fadeIn .3s ease',
+        'transition:opacity .3s'
+      ].join(';');
+      // Sisipkan setelah pay-grid
+      const grid = document.querySelector('.pay-grid');
+      grid.parentNode.insertBefore(toast, grid.nextSibling);
+    }
+    toast.style.opacity = '1';
+    toast.innerHTML = '✅ Nomor <strong style="color:#eeeef5;letter-spacing:1px">' + num + '</strong> (' + method + ') sudah ter-copy! Buka app-nya lalu paste.';
+    clearTimeout(toast._t);
+    toast._t = setTimeout(() => { toast.style.opacity = '0'; }, 4000);
+  }
+
+  function parseGamepassUrl() {
+    const url = document.getElementById('gp-url').value.trim();
+    const match = url.match(/game-pass\/(\d+)/i);
+    if (match) {
+      document.getElementById('gp-id').value = match[1];
+      onIdInput();
+    }
+  }
+
+  function extractAndVerify() {
+    parseGamepassUrl();
+    const id = document.getElementById('gp-id').value.trim();
+    if (id) showGamepassPreview(id);
+  }
+
+  function onIdInput() {
+    const id = document.getElementById('gp-id').value.trim();
+    if (id.length >= 6 && /^\d+$/.test(id)) {
+      setTimeout(() => showGamepassPreview(id), 300);
+    } else {
+      hidePreview();
+    }
+    updateSummary();
+  }
+
+  function showGamepassPreview(id) {
+    _gpId = id;
+    _gpVerified = true;
+    document.getElementById('gp-prev-id-val').textContent = id;
+    document.getElementById('gp-preview').classList.add('show');
+    updateSummary();
+  }
+
+  function hidePreview() {
+    _gpId = '';
+    _gpVerified = false;
+    document.getElementById('gp-preview').classList.remove('show');
+    updateSummary();
+  }
+
+  function updateSummary() {
+    const user = document.getElementById('username').value.trim();
+    const gpId = document.getElementById('gp-id').value.trim();
+    document.getElementById('sum-rbx').textContent = _rbx ? _rbx.toLocaleString('id') + ' R$' : '— R$';
+    document.getElementById('sum-pkg').textContent = _pkg || '—';
+    document.getElementById('sum-user').textContent = user || '—';
+    document.getElementById('sum-pay').textContent = _pay || '—';
+    document.getElementById('sum-total').textContent = _price ? 'Rp ' + _price.toLocaleString('id') : 'Rp —';
+    const gpIdDisplay = document.getElementById('sum-gpid');
+    if (gpId) {
+      gpIdDisplay.textContent = gpId;
+      gpIdDisplay.classList.remove('empty');
+    } else {
+      gpIdDisplay.textContent = 'Belum diisi';
+      gpIdDisplay.classList.add('empty');
+    }
+    const emailVal = document.getElementById('contact').value.trim();
+    const emailOk = emailVal && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal);
+    const canOrder = _pkg && _pay && user && gpId.length >= 6 && emailOk;
+    document.getElementById('btn-order').disabled = !canOrder;
+
+    // Update mobile sticky bar
+    const mobRobux = document.getElementById('mob-bar-robux');
+    const mobPrice = document.getElementById('mob-bar-price');
+    const mobBtn   = document.getElementById('mob-bar-btn');
+    if (mobRobux && mobPrice && mobBtn) {
+      if (_rbx) {
+        mobRobux.textContent = _rbx.toLocaleString('id') + ' R$';
+        mobPrice.innerHTML = _price
+          ? 'Total: <strong>Rp ' + _price.toLocaleString('id') + '</strong>'
+          : 'Pilih metode bayar';
+      } else {
+        mobRobux.textContent = 'Pilih paket';
+        mobPrice.textContent = 'Belum ada paket dipilih';
+      }
+      mobBtn.disabled = !canOrder;
+    }
+  }
+
+  // ── FIX: Copy nomor dengan fallback ──────────────────────────
+  function tapSalinNomor(num, el) {
+    navigator.clipboard.writeText(num).then(() => {
+      const hint = el.nextElementSibling;
+      const orig = el.textContent;
+      el.style.color = 'var(--green, #4caf50)';
+      if (hint) hint.textContent = '✅ Nomor tersalin!';
+      setTimeout(() => {
+        el.style.color = '';
+        if (hint) hint.textContent = '👆 Ketuk nomor untuk menyalin';
+      }, 2000);
+    }).catch(() => {
+      // fallback
+      const ta = document.createElement('textarea');
+      ta.value = num; document.body.appendChild(ta); ta.select();
+      document.execCommand('copy'); document.body.removeChild(ta);
+      el.style.color = 'var(--green, #4caf50)';
+      setTimeout(() => { el.style.color = ''; }, 2000);
+    });
+  }
+
+  function salinNomor(num, btn) {
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(num)
+        .then(() => showCopied(btn))
+        .catch(() => fallbackCopy(num, btn));
+    } else {
+      fallbackCopy(num, btn);
+    }
+  }
+
+  function fallbackCopy(num, btn) {
+    const el = document.createElement('textarea');
+    el.value = num;
+    el.setAttribute('readonly', '');
+    el.style.cssText = 'position:fixed;left:-9999px;top:-9999px;opacity:0;';
+    document.body.appendChild(el);
+    el.focus();
+    el.select();
+    try {
+      const ok = document.execCommand('copy');
+      if (ok) {
+        showCopied(btn);
+      } else {
+        // Semua cara gagal — tampilkan nomor biar bisa manual
+        alert('Salin nomor ini:\n' + num);
+      }
+    } catch(e) {
+      alert('Salin nomor ini:\n' + num);
+    }
+    document.body.removeChild(el);
+  }
+
+  function showCopied(btn) {
+    const ori = btn.textContent;
+    btn.textContent = '✓ Tersalin!';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = ori;
+      btn.classList.remove('copied');
+    }, 2000);
+  }
+  // ─────────────────────────────────────────────────────────────
+
+  async function placeOrder() {
+    const oid = 'RBX-' + Math.floor(100000 + Math.random() * 900000);
+    const user = document.getElementById('username').value.trim();
+    const gpId = document.getElementById('gp-id').value.trim();
+    _currentOrder = { oid, user, gpId };
+    const btn = document.getElementById('btn-order');
+    btn.disabled = true;
+    btn.textContent = '⏳ Memproses...';
+    try {
+      const resp = await fetch(`${BACKEND_URL}/api/create-transaction`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ order_id: oid, gross_amount: _price, robux: _rbx, username: user, gamepass_id: gpId, payment_method: _pay, item_name: `Top Up ${_rbx.toLocaleString('id')} Robux` })
+      });
+      if (!resp.ok) throw new Error('Backend error');
+      const { snap_token } = await resp.json();
+      window.snap.pay(snap_token, {
+        onSuccess: r => showOrderModal(oid, user, gpId, r.payment_type || _pay),
+        onPending: r => showOrderModal(oid, user, gpId, r.payment_type || _pay),
+        onError: r => alert('❌ Pembayaran gagal: ' + (r.status_message || 'Coba lagi.')),
+        onClose: () => {}
+      });
+    } catch(err) {
+      console.warn('[Midtrans] Fallback mode:', err.message);
+      showOrderModal(oid, user, gpId, _pay);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = '🚀 ORDER SEKARANG';
+    }
+  }
+
+  let _currentOrder = {};
+
+  async function kirimTelegram(oid, user, gpId, payMethod) {
+    const now = new Date().toLocaleString('id-ID', { timeZone:'Asia/Jakarta', day:'2-digit', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit' }) + ' WIB';
+    const nl = '\n';
+    const text = '🛒 ORDER TOP UP ROBUX' + nl + nl +
+      '📋 ID Pesanan: ' + oid + nl + '🕐 Waktu: ' + now + nl +
+      '👤 Username Roblox: ' + user + nl + '🎮 Gamepass ID: ' + gpId + nl +
+      '💎 Paket: ' + _rbx.toLocaleString('id') + ' Robux' + nl +
+      '💰 Total: Rp ' + _price.toLocaleString('id') + nl +
+      '💳 Pembayaran: ' + payMethod + nl + '📌 Status: Menunggu Pembayaran';
+    try {
+      await fetch('https://api.telegram.org/bot' + BOT_TOKEN + '/sendMessage', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ chat_id: CHAT_ID, text })
+      });
+    } catch(e) { console.warn('Telegram error:', e); }
+  }
+
+  function showOrderModal(oid, user, gpId, payMethod) {
+    document.getElementById('modal-oid').textContent   = oid;
+    document.getElementById('modal-rbx').textContent   = _rbx.toLocaleString('id') + ' R$';
+    document.getElementById('modal-total').textContent = 'Rp ' + _price.toLocaleString('id');
+    document.getElementById('modal-user').textContent  = user;
+    document.getElementById('modal-pay').textContent   = payMethod;
+    document.getElementById('modal-gp-id').textContent = gpId;
+    document.getElementById('modal-gp-name').textContent = 'Gamepass #' + gpId;
+
+    const area = document.getElementById('pay-action-area');
+    const num = PAYMENT_NUMBERS[payMethod];
+
+    if (payMethod === 'QRIS') {
+      area.innerHTML =
+        '<button onclick="bukaQRIS()" style="' +
+          'width:100%;background:linear-gradient(135deg,var(--accent),#5b3de8);' +
+          'color:#fff;border:none;border-radius:9px;padding:13px;' +
+          'font-family:\'Outfit\',sans-serif;font-weight:800;font-size:0.85rem;' +
+          'cursor:pointer;margin-bottom:8px;display:flex;align-items:center;' +
+          'justify-content:center;gap:8px;transition:all .2s;' +
+        '">💳 Buka QR Code untuk Bayar</button>';
+    } else if (num) {
+      area.innerHTML =
+        '<div class="pay-action-box">' +
+          '<div class="pay-action-label">Nomor ' + payMethod + '</div>' +
+          '<div class="pay-number" id="pay-num-display" title="Ketuk untuk salin" style="cursor:pointer" onclick="tapSalinNomor(\'' + num + '\', this)">' + num + '</div>' +
+          '<div style="font-size:10px;color:#888;text-align:center;margin-top:4px;">👆 Ketuk nomor untuk menyalin</div>' +
+        '</div>';
+    } else {
+      area.innerHTML = '';
+    }
+
+    // Simpan order ke localStorage — per user + global untuk admin
+    const contact = (document.getElementById('contact')?.value || '').trim();
+    const orderData = {
+      id: oid, username: user, gpId: gpId,
+      robux: _rbx, price: _price, method: payMethod,
+      email: contact,
+      whatsapp: '',
+      status: 'pending', bukti: null, proofImage: null, buktiTime: null, time: Date.now()
+    };
+    saveOrderForUser(orderData);
+    renderMyOrders();
+
+    document.getElementById('modal').classList.add('show');
+    kirimTelegram(oid, user, gpId, payMethod);
+  }
+
+  // ── FIX: QRIS popup dengan validasi URL ──────────────────────
+  function bukaQRIS() {
+    const content = document.getElementById('qris-content');
+    document.getElementById('qris-amount').textContent = 'Rp ' + _price.toLocaleString('id');
+
+    if (!QRIS_URL || QRIS_URL.trim() === '') {
+      // URL belum diisi
+      content.innerHTML =
+        '<div class="qris-placeholder">⚠️ URL QRIS belum diset.<br><br>Upload foto QRIS ke Imgur lalu isi variabel QRIS_URL di script.</div>';
+    } else {
+      // Tampilkan gambar, dengan fallback jika gagal load
+      content.innerHTML = '<img class="qris-img" id="qris-img-el" src="' + QRIS_URL + '" alt="QRIS" onerror="qrisImgError()">';
+    }
+
+    document.getElementById('qris-overlay').classList.add('show');
+  }
+
+  function qrisImgError() {
+    document.getElementById('qris-content').innerHTML =
+      '<div class="qris-error">❌ Gambar QRIS gagal dimuat.<br>Pastikan URL benar dan bukan link Discord (expired).</div>' +
+      '<div class="qris-placeholder">Ganti QRIS_URL dengan link Imgur permanen</div>';
+  }
+  // ─────────────────────────────────────────────────────────────
+
+  function closeQris(e) {
+    if (e.target === document.getElementById('qris-overlay'))
+      document.getElementById('qris-overlay').classList.remove('show');
+  }
+
+  // previewBukti removed (upload via Pesanan Saya)
+
+  // Kirim foto bukti ke Telegram via sendPhoto (base64 → Blob → FormData)
+  function sendBuktiTelegram(imageBase64, caption) {
+    try {
+      const [meta, b64] = imageBase64.split(',');
+      const mime = (meta.match(/:(.*?);/) || ['','image/jpeg'])[1];
+      const binary = atob(b64);
+      const arr = new Uint8Array(binary.length);
+      for (let i = 0; i < binary.length; i++) arr[i] = binary.charCodeAt(i);
+      const blob = new Blob([arr], { type: mime });
+      const fd = new FormData();
+      fd.append('chat_id', CHAT_ID);
+      fd.append('photo', blob, 'bukti.jpg');
+      fd.append('caption', caption);
+      fetch('https://api.telegram.org/bot' + BOT_TOKEN + '/sendPhoto', {
+        method: 'POST', body: fd
+      }).catch(e => console.warn('Telegram sendPhoto error:', e));
+    } catch(e) { console.warn('Telegram sendPhoto error:', e); }
+  }
+
+  // kirimBukti removed (upload via Pesanan Saya)
+
+  function closeModal() { document.getElementById('modal').classList.remove('show'); }
+  function closeOutside(e) { if (e.target === document.getElementById('modal')) closeModal(); }
+
+  // ── ORDER STORAGE (per user + mirrored ke global untuk admin) ──
+  function getCurrentUsername() {
+    try {
+      const s = JSON.parse(localStorage.getItem('rbx_session') || 'null');
+      return s ? s.username : 'guest';
+    } catch(e) { return 'guest'; }
+  }
+  function userOrderKey(uname) { return 'rbx_orders_u_' + (uname || getCurrentUsername()); }
+
+  function stripProofFromOrder(o) {
+    const c = Object.assign({}, o);
+    if (c.proofImage && c.proofImage.startsWith('data:')) { delete c.proofImage; c.hasProof = true; }
+    if (c.bukti && c.bukti.startsWith('data:')) { delete c.bukti; c.hasProof = true; }
+    return c;
+  }
+
+  function saveOrderForUser(order) {
+    const uname = getCurrentUsername();
+    const uKey = userOrderKey(uname);
+    const clean = stripProofFromOrder(order);
+    try {
+      const uOrders = JSON.parse(localStorage.getItem(uKey) || '[]');
+      if (!uOrders.find(o => o.id === clean.id)) uOrders.unshift(clean);
+      localStorage.setItem(uKey, JSON.stringify(uOrders));
+    } catch(e) { console.warn('saveOrderForUser uKey gagal:', e); }
+    try {
+      const all = JSON.parse(localStorage.getItem('rbx_orders') || '[]');
+      if (!all.find(o => o.id === clean.id)) all.unshift(clean);
+      localStorage.setItem('rbx_orders', JSON.stringify(all));
+    } catch(e) { console.warn('saveOrderForUser rbx_orders gagal:', e); }
+
+    // ── Simpan ke Supabase (terpusat, bisa dilihat admin) ──
+    sbInsertOrder(order);
+  }
+
+  // Kompres gambar base64 supaya tidak overload localStorage (maks ~400KB)
+  function compressImageBase64(base64, maxW, maxH, quality) {
+    return new Promise(resolve => {
+      try {
+        const img = new Image();
+        img.onload = () => {
+          let w = img.width, h = img.height;
+          if (w > maxW || h > maxH) {
+            const ratio = Math.min(maxW / w, maxH / h);
+            w = Math.round(w * ratio); h = Math.round(h * ratio);
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = w; canvas.height = h;
+          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+          resolve(canvas.toDataURL('image/jpeg', quality));
+        };
+        img.onerror = () => resolve(base64);
+        img.src = base64;
+      } catch(e) { resolve(base64); }
+    });
+  }
+
+  async function updateOrderById(oid, patch) {
+    const proofData = patch.bukti || patch.proofImage;
+    if (proofData) {
+      patch = Object.assign({}, patch);
+      // Simpan gambar ke IndexedDB (persist saat refresh, kapasitas besar)
+      _proofMemoryCache[oid] = proofData;
+      await idbSet('rbx_proof_' + oid, proofData);
+      // Jangan simpan base64 besar di dalam array orders
+      delete patch.proofImage;
+      delete patch.bukti;
+      patch.hasProof = true;
+    }
+
+    // Update di semua key rbx_orders_u_* (tanpa gambar besar)
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (!key || !key.startsWith('rbx_orders_u_')) continue;
+      try {
+        const uOrders = JSON.parse(localStorage.getItem(key) || '[]');
+        const ui = uOrders.findIndex(o => o.id === oid);
+        if (ui !== -1) {
+          Object.assign(uOrders[ui], patch);
+          localStorage.setItem(key, JSON.stringify(uOrders));
+        }
+      } catch(e) { console.warn('updateOrderById user error:', e); }
+    }
+
+    // Update di rbx_orders global (tanpa gambar besar)
+    try {
+      const all = JSON.parse(localStorage.getItem('rbx_orders') || '[]');
+      const ai = all.findIndex(o => o.id === oid);
+      if (ai !== -1) {
+        Object.assign(all[ai], patch);
+        localStorage.setItem('rbx_orders', JSON.stringify(all));
+      }
+    } catch(e) { console.warn('updateOrderById global error:', e); }
+  }
+
+  function getProofImage(oid) {
+    // Ambil dari memory cache (sudah diisi dari IndexedDB saat preloadAllProofs())
+    return _proofMemoryCache[oid] || null;
+  }
+
+  function getMyOrders() {
+    const uname = getCurrentUsername();
+    const uKey = userOrderKey(uname);
+    let uOrders = JSON.parse(localStorage.getItem(uKey) || '[]');
+
+    // Fallback: kalau uOrders kosong, cari di semua key rbx_orders_u_*
+    if (uOrders.length === 0) {
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (!key || !key.startsWith('rbx_orders_u_')) continue;
+        try {
+          const found = JSON.parse(localStorage.getItem(key) || '[]');
+          if (found.length > 0) { uOrders = found; break; }
+        } catch(e) {}
+      }
+    }
+
+    // Sinkronkan status dari rbx_orders lokal (backup)
+    const all = JSON.parse(localStorage.getItem('rbx_orders') || '[]');
+    return uOrders.map(o => {
+      const adminVer = all.find(a => a.id === o.id);
+      const proof = getProofImage(o.id);
+      if (adminVer) {
+        return Object.assign({}, o, {
+          status: adminVer.status || o.status,
+          sentAt: adminVer.sentAt || o.sentAt,
+          proofImage: proof || adminVer.proofImage || o.proofImage,
+          bukti: proof || adminVer.bukti || o.bukti,
+        });
+      }
+      if (proof) { return Object.assign({}, o, { proofImage: proof, bukti: proof }); }
+      return o;
+    });
+  }
+
+  // ── PESANAN SAYA ──────────────────────────────────────────────
+  function renderMyOrders() {
+    const s = getSession();
+    const section = document.getElementById('my-orders-section');
+    if (!s) { section.classList.remove('show'); return; }
+
+    const orders = getMyOrders();
+    section.classList.toggle('show', orders.length > 0);
+    document.getElementById('my-orders-count').textContent = orders.length;
+
+    const statusLabel = {
+      pending:     '⏳ Menunggu',
+      bukti_masuk: '📋 Diverifikasi',
+      success:     '✅ Selesai',
+      failed:      '❌ Ditolak'
+    };
+
+    const list = document.getElementById('my-orders-list');
+    if (orders.length === 0) {
+      list.innerHTML = '<div class="my-orders-empty"><span class="empty-icon">📭</span>Belum ada pesanan<p>Pesanan kamu akan muncul di sini setelah checkout</p></div>';
+      return;
+    }
+
+    list.innerHTML = orders.map(o => {
+      const statusClass = o.status || 'pending';
+      const statusTxt   = statusLabel[statusClass] || '⏳ Menunggu';
+      const sudahKirim  = o.bukti || o.proofImage;
+      const tgl = new Date(o.time).toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' });
+      const buktiTgl = o.buktiTime ? new Date(o.buktiTime).toLocaleDateString('id-ID', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' }) : null;
+
+      const isFinished = o.status === 'success' || o.status === 'failed';
+
+      // Bukti section dalam detail
+      let buktiSection = '';
+      if (isFinished) {
+        buktiSection = `
+          <div class="btn-kirim-bukti done">
+            ${o.status === 'success' ? '✅ Robux Sudah Dikirim' : '❌ Order Ditolak'}
+          </div>`;
+      } else if (sudahKirim) {
+        buktiSection = `
+          <div class="order-bukti-label">Bukti Pembayaran <span></span></div>
+          <img class="bukti-preview-thumb" src="${sudahKirim}" alt="bukti" onclick="openLightbox(this.src)">
+          ${buktiTgl ? `<div style="font-size:0.62rem;color:var(--muted);margin-bottom:10px;">Dikirim: ${buktiTgl}</div>` : ''}
+          <button class="btn-update-bukti" onclick="event.stopPropagation();openBuktiModal('${o.id}', event)">🔄 Update Bukti Pembayaran</button>`;
+      } else {
+        buktiSection = `
+          <div class="order-bukti-label">Bukti Pembayaran <span></span></div>
+          <div style="background:rgba(255,200,87,.06);border:1px dashed rgba(255,200,87,.25);border-radius:8px;padding:12px;text-align:center;margin-bottom:10px;">
+            <div style="font-size:1.4rem;margin-bottom:5px;">📸</div>
+            <div style="font-size:0.7rem;color:var(--gold);font-weight:600;">Bukti belum dikirim</div>
+            <div style="font-size:0.62rem;color:var(--muted);margin-top:3px;">Upload foto transfer untuk mempercepat proses</div>
+          </div>
+          <button class="btn-kirim-bukti" onclick="event.stopPropagation();openBuktiModal('${o.id}', event)">
+            📤 Kirim Bukti Pembayaran
+          </button>`;
+      }
+
+      return `
+        <div class="order-card" id="ordercard-${o.id}" onclick="toggleOrderCard('${o.id}')">
+          <div class="order-card-summary">
+            <div class="order-card-icon">💎</div>
+            <div class="order-card-info">
+              <div class="order-card-id">${o.id}</div>
+              <div class="order-card-main">${o.robux ? o.robux.toLocaleString('id') + ' Robux' : '—'}</div>
+              <div class="order-card-sub">${o.method || '—'} · ${tgl}</div>
+            </div>
+            <div class="order-card-right">
+              <div class="order-card-price">Rp ${o.price ? o.price.toLocaleString('id') : '—'}</div>
+              <span class="order-status ${statusClass}">${statusTxt}</span>
+              <div class="order-card-chevron">▼</div>
+            </div>
+          </div>
+          <div class="order-detail" onclick="event.stopPropagation()" onmousedown="event.stopPropagation()">
+            <div class="order-detail-grid">
+              <div class="od-box">
+                <div class="od-label">Robux</div>
+                <div class="od-val gold">${o.robux ? o.robux.toLocaleString('id') + ' R$' : '—'}</div>
+              </div>
+              <div class="od-box">
+                <div class="od-label">Total Bayar</div>
+                <div class="od-val green">Rp ${o.price ? o.price.toLocaleString('id') : '—'}</div>
+              </div>
+              <div class="od-box">
+                <div class="od-label">Metode</div>
+                <div class="od-val purple">${o.method || '—'}</div>
+              </div>
+              <div class="od-box">
+                <div class="od-label">Gamepass ID</div>
+                <div class="od-val" title="${o.gpId || '—'}">${o.gpId || '—'}</div>
+              </div>
+              <div class="od-box">
+                <div class="od-label">Username</div>
+                <div class="od-val" title="${o.username || '—'}">${o.username || '—'}</div>
+              </div>
+              <div class="od-box">
+                <div class="od-label">Tanggal Order</div>
+                <div class="od-val" style="font-size:0.68rem">${tgl}</div>
+              </div>
+            </div>
+            <div class="order-bukti-section" onclick="event.stopPropagation()" onmousedown="event.stopPropagation()">
+              ${buktiSection}
+              ${!isFinished && o.status !== 'bukti_masuk' && !sudahKirim ? `
+              <button onclick="event.stopPropagation();cancelOrder('${o.id}')" style="width:100%;margin-top:8px;background:transparent;border:1px solid rgba(252,92,125,.35);border-radius:9px;padding:10px;color:#fc5c7d;font-size:0.75rem;font-weight:700;cursor:pointer;transition:all .2s;" onmouseover="this.style.background='rgba(252,92,125,.12)'" onmouseout="this.style.background='transparent'">
+                ✕ Batalkan Order
+              </button>` : ''}
+            </div>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  async function cancelOrder(oid) {
+    if (!confirm('Yakin ingin membatalkan order ' + oid + '?\nOrder yang dibatalkan tidak bisa dikembalikan.')) return;
+
+    // Hapus dari semua localStorage (user key + global)
+    const uname = getCurrentUsername();
+    const uKey = userOrderKey(uname);
+    let uOrders = JSON.parse(localStorage.getItem(uKey) || '[]');
+    uOrders = uOrders.filter(o => o.id !== oid);
+    localStorage.setItem(uKey, JSON.stringify(uOrders));
+
+    try {
+      let all = JSON.parse(localStorage.getItem('rbx_orders') || '[]');
+      all = all.filter(o => o.id !== oid);
+      localStorage.setItem('rbx_orders', JSON.stringify(all));
+    } catch(e) {}
+
+    // Tandai sebagai cancelled di Supabase
+    await sbUpdateOrderStatus(oid, { status: 'cancelled' });
+
+    renderMyOrders();
+    showStatusToast('Order ' + oid + ' berhasil dibatalkan.', 'error');
+  }
+
+  function toggleOrderCard(oid) {
+    const card = document.getElementById('ordercard-' + oid);
+    if (!card) return;
+    card.classList.toggle('expanded');
+  }
+
+  function openLightbox(src) {
+    document.getElementById('bukti-lightbox-img').src = src;
+    document.getElementById('bukti-lightbox').classList.add('show');
+  }
+  function closeLightbox() {
+    document.getElementById('bukti-lightbox').classList.remove('show');
+  }
+
+  // ── INDEXEDDB PROOF STORAGE ───────────────────────────────────
+  // Ganti localStorage untuk gambar bukti → IndexedDB (kapasitas jauh lebih besar, persist saat refresh)
+  const _IDB_NAME = 'rbx_store';
+  const _IDB_STORE = 'proofs';
+  let _idbReady = null;
+
+  function openIDB() {
+    if (_idbReady) return _idbReady;
+    _idbReady = new Promise((resolve, reject) => {
+      const req = indexedDB.open(_IDB_NAME, 1);
+      req.onupgradeneeded = e => {
+        e.target.result.createObjectStore(_IDB_STORE);
+      };
+      req.onsuccess = e => resolve(e.target.result);
+      req.onerror = () => reject(req.error);
+    });
+    return _idbReady;
+  }
+
+  async function idbSet(key, value) {
+    try {
+      const db = await openIDB();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(_IDB_STORE, 'readwrite');
+        tx.objectStore(_IDB_STORE).put(value, key);
+        tx.oncomplete = () => resolve(true);
+        tx.onerror = () => reject(tx.error);
+      });
+    } catch(e) {
+      // Fallback ke localStorage kalau IndexedDB gagal
+      try { localStorage.setItem(key, value); } catch(_) {}
+      return false;
+    }
+  }
+
+  async function idbGet(key) {
+    try {
+      const db = await openIDB();
+      return new Promise((resolve) => {
+        const tx = db.transaction(_IDB_STORE, 'readonly');
+        const req = tx.objectStore(_IDB_STORE).get(key);
+        req.onsuccess = () => resolve(req.result || null);
+        req.onerror = () => resolve(null);
+      });
+    } catch(e) {
+      // Fallback ke localStorage
+      return localStorage.getItem(key) || null;
+    }
+  }
+
+  // Memory cache untuk akses sync sementara (diisi saat load)
+  const _proofMemoryCache = {};
+
+  // Preload semua proof dari IndexedDB ke memory cache saat halaman load
+  async function preloadAllProofs() {
+    try {
+      const db = await openIDB();
+      return new Promise(resolve => {
+        const tx = db.transaction(_IDB_STORE, 'readonly');
+        const req = tx.objectStore(_IDB_STORE).openCursor();
+        req.onsuccess = e => {
+          const cursor = e.target.result;
+          if (cursor) {
+            if (String(cursor.key).startsWith('rbx_proof_')) {
+              const oid = String(cursor.key).replace('rbx_proof_', '');
+              _proofMemoryCache[oid] = cursor.value;
+            }
+            cursor.continue();
+          } else {
+            resolve();
+          }
+        };
+        req.onerror = () => resolve();
+      });
+    } catch(e) {
+      // Fallback: load dari localStorage
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k && k.startsWith('rbx_proof_')) {
+          _proofMemoryCache[k.replace('rbx_proof_', '')] = localStorage.getItem(k);
+        }
+      }
+    }
+  }
+
+  // Bersihkan gambar base64 lama dari localStorage supaya tidak QuotaExceededError
+  function cleanupLocalStorageImages() {
+    const keys = [];
+    for (let i = 0; i < localStorage.length; i++) keys.push(localStorage.key(i));
+    keys.forEach(k => {
+      if (!k) return;
+      if (k === 'rbx_orders' || k.startsWith('rbx_orders_u_')) {
+        try {
+          const arr = JSON.parse(localStorage.getItem(k) || '[]');
+          let dirty = false;
+          arr.forEach(o => {
+            if ((o.proofImage && o.proofImage.startsWith('data:')) ||
+                (o.bukti && o.bukti.startsWith('data:'))) {
+              if (o.proofImage) delete o.proofImage;
+              if (o.bukti) delete o.bukti;
+              o.hasProof = true;
+              dirty = true;
+            }
+          });
+          if (dirty) localStorage.setItem(k, JSON.stringify(arr));
+        } catch(e) {}
+      }
+    });
+  }
+  cleanupLocalStorageImages();
+
+  // Panggil preload saat DOM ready — setelah selesai baru render UI
+  preloadAllProofs().then(() => {
+    updateUserBar();
+    renderMyOrders();
+  });
+
+  // ── MODAL BUKTI (dari Pesanan Saya) ──────────────────────────
+  let _buktiOrderId = null;
+  let _buktiFile = null;
+
+  function openBuktiModal(oid, ev) {
+    if (ev) { ev.stopPropagation(); ev.preventDefault(); }
+    const orders = getMyOrders();
+    const o = orders.find(x => x.id === oid);
+    if (!o) return;
+    _buktiOrderId = oid;
+    _buktiFile = null;
+
+    document.getElementById('bukti-modal-oid').textContent = oid;
+    document.getElementById('bukti-modal-info').innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div>
+          <div style="font-weight:700;font-size:0.85rem;">${o.robux ? o.robux.toLocaleString('id') + ' Robux' : '—'}</div>
+          <div style="color:var(--muted);font-size:0.7rem;margin-top:2px;">${o.method || '—'} · Rp ${o.price ? o.price.toLocaleString('id') : '—'}</div>
+        </div>
+        <div style="font-family:'Outfit',sans-serif;font-weight:800;font-size:1rem;color:var(--accent);">Rp ${o.price ? o.price.toLocaleString('id') : '—'}</div>
+      </div>`;
+
+    // Reset preview — kalau sudah ada bukti sebelumnya, tampilkan
+    const preview = document.getElementById('bukti-modal-preview');
+    const zone = document.getElementById('bukti-modal-zone');
+    const placeholder = document.getElementById('bukti-modal-placeholder');
+    const existing = o.bukti || o.proofImage;
+    if (existing) {
+      preview.src = existing;
+      preview.style.display = 'block';
+      zone.style.display = 'none';
+      placeholder.style.display = 'block';
+      const btn = document.getElementById('bukti-modal-btn');
+      btn.disabled = false; btn.style.opacity = '1';
+      btn.textContent = '🔄 Update Bukti Pembayaran';
+    } else {
+      preview.src = '';
+      preview.style.display = 'none';
+      zone.style.display = 'block';
+      placeholder.style.display = 'block';
+      const btn = document.getElementById('bukti-modal-btn');
+      btn.disabled = true; btn.style.opacity = '.5';
+      btn.textContent = '📤 Kirim Bukti Pembayaran';
+    }
+
+    // Reset input file
+    const fileInput = document.getElementById('bukti-modal-file');
+    if (fileInput) fileInput.value = '';
+
+    document.getElementById('modal-bukti').classList.add('show');
+  }
+
+  function closeBuktiModal() {
+    document.getElementById('modal-bukti').classList.remove('show');
+    _buktiOrderId = null; _buktiFile = null;
+  }
+
+  function handleBuktiFile(input) {
+    if (input.files && input.files[0]) processBuktiFile(input.files[0]);
+  }
+  function handleBuktiDrop(e) {
+    e.preventDefault();
+    document.getElementById('bukti-modal-zone').style.borderColor = '';
+    const file = e.dataTransfer.files[0];
+    if (file) processBuktiFile(file);
+  }
+  function processBuktiFile(file) {
+    const reader = new FileReader();
+    reader.onload = e => {
+      _buktiFile = e.target.result;
+      const preview = document.getElementById('bukti-modal-preview');
+      const zone = document.getElementById('bukti-modal-zone');
+      preview.src = _buktiFile;
+      preview.style.display = 'block';
+      zone.style.display = 'none';
+      const btn = document.getElementById('bukti-modal-btn');
+      btn.disabled = false;
+      btn.style.opacity = '1';
+      btn.style.background = '';
+      btn.style.color = '';
+      btn.textContent = '📤 Kirim Bukti Pembayaran';
+    };
+    reader.readAsDataURL(file);
+  }
+
+  async function submitBuktiModal() {
+    if (!_buktiOrderId) return;
+
+    // Kalau tidak ada file baru, cek apakah sudah ada bukti sebelumnya
+    if (!_buktiFile) {
+      const orders = getMyOrders();
+      const o = orders.find(x => x.id === _buktiOrderId);
+      const existing = (o && (o.bukti || o.proofImage)) || getProofImage(_buktiOrderId);
+      if (!existing) {
+        alert('⚠️ Pilih foto bukti pembayaran terlebih dahulu!');
+        return;
+      }
+      _buktiFile = existing;
+    }
+
+    const btn = document.getElementById('bukti-modal-btn');
+    btn.disabled = true;
+    btn.textContent = '⏳ Memproses...';
+
+    // Kompres gambar (maks 800x800, kualitas 70%)
+    let buktiData = _buktiFile;
+    try {
+      buktiData = await compressImageBase64(_buktiFile, 800, 800, 0.70);
+    } catch(e) { buktiData = _buktiFile; }
+
+    btn.textContent = '⏳ Mengupload...';
+
+    // 1. Upload ke Supabase Storage
+    const proofUrl = await sbUploadBukti(_buktiOrderId, buktiData);
+
+    if (proofUrl) {
+      // 2. Update kolom proof_url & has_proof di Supabase
+      await sbUpdateOrderStatus(_buktiOrderId, {
+        proof_url: proofUrl,
+        has_proof: true,
+        status: 'pending'
+      });
+      btn.textContent = '⏳ Mengirim...';
+    } else {
+      // Fallback: lanjut pakai IndexedDB saja kalau Supabase Storage gagal
+      console.warn('[Bukti] Supabase Storage gagal, lanjut IndexedDB only');
+    }
+
+    // 3. Simpan ke IndexedDB lokal juga (untuk tampil di sisi customer)
+    await updateOrderById(_buktiOrderId, {
+      bukti: buktiData,
+      proofImage: buktiData,
+      buktiTime: Date.now(),
+      status: 'bukti_masuk',
+      ...(proofUrl ? { proof_url: proofUrl, hasProof: true } : {})
+    });
+
+    // 4. Kirim foto bukti ke Telegram
+    const orders = getMyOrders();
+    const o = orders.find(x => x.id === _buktiOrderId) || {};
+    const caption2 = '📸 BUKTI PEMBAYARAN MASUK\n\nOrder: ' + _buktiOrderId +
+      '\nUsername: ' + (o.username || '—') +
+      '\nRobux: ' + (o.robux ? o.robux.toLocaleString('id') + ' R$' : '—') +
+      '\nTotal: Rp ' + (o.price ? o.price.toLocaleString('id') : '—') +
+      '\nMetode: ' + (o.method || '—') +
+      (proofUrl ? '\n🔗 Bukti: ' + proofUrl : '') +
+      '\n\n✅ Segera cek dan konfirmasi order!';
+    sendBuktiTelegram(buktiData, caption2);
+
+    btn.textContent = '✅ Bukti Terkirim!';
+    btn.style.background = 'var(--green)';
+    btn.style.color = '#000';
+    setTimeout(() => {
+      closeBuktiModal();
+      renderMyOrders();
+    }, 1200);
+  }
+
+  // ── SESSION INTEGRATION ──────────────────────────────────────
+  function getSession() {
+    try { return JSON.parse(localStorage.getItem('rbx_session') || 'null'); } catch(e) { return null; }
+  }
+  function logoutStore() {
+    localStorage.removeItem('rbx_session');
+    updateUserBar();
+    renderMyOrders();
+  }
+  function updateUserBar() {
+    const s = getSession();
+    const userBar  = document.getElementById('user-bar');
+    const loginBar = document.getElementById('login-bar');
+    const nameEl   = document.getElementById('user-bar-name');
+    if (s) {
+      userBar.style.display  = 'flex';
+      loginBar.style.display = 'none';
+      nameEl.textContent = '👤 @' + s.username;
+      const uField = document.getElementById('username');
+      if (uField && !uField.value) uField.value = s.username;
+    } else {
+      userBar.style.display  = 'none';
+      loginBar.style.display = 'block';
+    }
+    // renderMyOrders dipanggil oleh preloadAllProofs() setelah IndexedDB siap
+    // agar gambar bukti sudah dimuat ke memory cache sebelum render
+  }
+  // Redirect to upload_bukti page with current order id
+  function goToUploadBukti() {
+    const oid = document.getElementById('modal-oid').textContent;
+    if (oid && oid !== 'RBX-000000') {
+      window.location.href = 'rbxstore_upload_bukti.html?oid=' + oid;
+    } else {
+      window.location.href = 'rbxstore_upload_bukti.html';
+    }
+  }
+  // updateUserBar & renderMyOrders dipanggil setelah preloadAllProofs() selesai (lihat di atas)
+
+  // ── POLLING STATUS ORDER dari Supabase (tiap 5 detik) ──
+  async function pollOrderStatus() {
+    const s = getSession();
+    if (!s) return;
+    const uname = getCurrentUsername();
+
+    // Ambil status terbaru dari Supabase
+    const supaOrders = await sbGetMyOrders(uname);
+    if (!supaOrders) {
+      // Fallback ke localStorage lama
+      _pollLocalFallback(uname);
+      return;
+    }
+
+    const uKey = userOrderKey(uname);
+    let uOrders = JSON.parse(localStorage.getItem(uKey) || '[]');
+    let changed = false;
+
+    supaOrders.forEach(sRow => {
+      // Skip order yang sudah dibatalkan customer
+      if (sRow.status === 'cancelled' || sRow.status === 'canceled') {
+        // Pastikan juga dihapus dari localStorage kalau masih ada
+        const idx = uOrders.findIndex(o => o.id === sRow.id);
+        if (idx !== -1) { uOrders.splice(idx, 1); changed = true; }
+        return;
+      }
+
+      const local = uOrders.find(o => o.id === sRow.id);
+      const newStatus = sRow.status === 'completed' ? 'success' : sRow.status;
+      if (local && local.status !== newStatus) {
+        local.status = newStatus;
+        if (sRow.sent_at) local.sentAt = new Date(sRow.sent_at).getTime();
+        changed = true;
+        if (newStatus === 'success') {
+          showStatusToast('✅ Order ' + sRow.id + ' — Robux berhasil dikirim!', 'success');
+        } else if (newStatus === 'failed') {
+          showStatusToast('❌ Order ' + sRow.id + ' — ditolak oleh admin.', 'error');
+        }
+      }
+      // Sync proof_url dari Supabase ke lokal
+      if (local && sRow.proof_url && !local.proof_url) {
+        local.proof_url = sRow.proof_url;
+        local.hasProof = true;
+        changed = true;
+      }
+      // Kalau ada order di Supabase yang belum ada di localStorage (misal login device lain)
+      if (!local) {
+        const normalized = {
+          id: sRow.id, username: sRow.username, gpId: sRow.gp_id || '',
+          robux: Number(sRow.robux||0), price: Number(sRow.price||0),
+          method: sRow.method||'-', email: sRow.email||'',
+          status: newStatus,
+          time: sRow.created_at ? new Date(sRow.created_at).getTime() : Date.now(),
+          hasProof: !!(sRow.proof_url || sRow.has_proof),
+          proof_url: sRow.proof_url || null,
+        };
+        uOrders.unshift(normalized);
+        changed = true;
+      }
+    });
+
+    if (changed) {
+      localStorage.setItem(uKey, JSON.stringify(uOrders));
+      renderMyOrders();
+    }
+  }
+
+  function _pollLocalFallback(uname) {
+    const uKey = userOrderKey(uname);
+    const uOrders = JSON.parse(localStorage.getItem(uKey) || '[]');
+    const all = JSON.parse(localStorage.getItem('rbx_orders') || '[]');
+    let changed = false;
+    const filtered = uOrders.filter(o => { const e = all.find(a => a.id === o.id); if (!e) { changed = true; return false; } return true; });
+    filtered.forEach(o => {
+      const av = all.find(a => a.id === o.id);
+      if (av && av.status !== o.status) {
+        o.status = av.status;
+        if (av.sentAt) o.sentAt = av.sentAt;
+        changed = true;
+        if (av.status === 'success') showStatusToast('✅ Order ' + o.id + ' — Robux berhasil dikirim!', 'success');
+        else if (av.status === 'failed') showStatusToast('❌ Order ' + o.id + ' — ditolak oleh admin.', 'error');
+      }
+    });
+    if (changed) { localStorage.setItem(uKey, JSON.stringify(filtered)); renderMyOrders(); }
+  }
+
+  function showStatusToast(msg, type) {
+    let t = document.getElementById('status-toast');
+    if (!t) {
+      t = document.createElement('div');
+      t.id = 'status-toast';
+      t.style.cssText = [
+        'position:fixed', 'bottom:20px', 'left:50%', 'transform:translateX(-50%) translateY(10px)',
+        'background:#111118', 'border-radius:10px', 'padding:12px 20px',
+        'font-size:0.78rem', 'font-weight:600', 'z-index:9999',
+        'opacity:0', 'transition:all .3s', 'pointer-events:none',
+        'white-space:nowrap', 'max-width:90vw', 'text-align:center'
+      ].join(';');
+      document.body.appendChild(t);
+    }
+    t.textContent = msg;
+    t.style.borderColor = type === 'success' ? 'rgba(57,217,138,.5)' : 'rgba(252,92,125,.5)';
+    t.style.border = '1px solid ' + (type === 'success' ? 'rgba(57,217,138,.5)' : 'rgba(252,92,125,.5)');
+    t.style.color = type === 'success' ? '#39d98a' : '#fc5c7d';
+    t.style.opacity = '1';
+    t.style.transform = 'translateX(-50%) translateY(0)';
+    clearTimeout(t._t);
+    t._t = setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateX(-50%) translateY(10px)'; }, 4000);
+  }
+
+  setInterval(pollOrderStatus, 5000);
+
+  // ── TRUST BAR: start from right, scroll left seamlessly ──
+  (function() {
+    const track = document.querySelector('.trust-track');
+    if (!track) return;
+    // Measure half-width (one set of items)
+    track.style.animation = 'none';
+    const halfW = track.scrollWidth / 2;
+    const vw = window.innerWidth;
+    // Start: right edge of screen, End: -halfW (one full set scrolled out left)
+    const startX = vw;
+    const endX = -halfW;
+    const distance = startX - endX;
+    const speed = 80; // px per second
+    const duration = distance / speed;
+    // Set custom keyframes via style
+    const styleEl = document.createElement('style');
+    styleEl.textContent = `
+      @keyframes trustScroll {
+        from { transform: translateX(${startX}px); }
+        to   { transform: translateX(${endX}px); }
+      }
+    `;
+    document.head.appendChild(styleEl);
+    track.style.animation = `trustScroll ${duration}s linear infinite`;
+  })();
+</script>
+</body>
+</html>
