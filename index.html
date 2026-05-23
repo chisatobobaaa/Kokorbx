@@ -287,6 +287,15 @@
   .chat-status-dot.resolved { background: var(--green); }
   .notif-balasan-dot { position: absolute; top: -3px; right: -3px; width: 10px; height: 10px; background: var(--accent2); border-radius: 50%; border: 2px solid var(--bg); display: none; }
   .keluhan-tab { position: relative; }
+  /* Customer reply area */
+  .customer-reply-wrap { margin-top: 10px; border-top: 1px solid var(--border); padding-top: 10px; }
+  .customer-reply-textarea { width: 100%; background: var(--s2); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; outline: none; transition: border-color .2s; box-sizing: border-box; resize: vertical; min-height: 60px; }
+  .customer-reply-textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(124,92,252,.1); }
+  .customer-reply-textarea::placeholder { color: rgba(100,100,128,0.5); }
+  .btn-customer-reply { width: 100%; margin-top: 7px; background: linear-gradient(135deg, var(--accent), #5b3de8); color: #fff; border: none; border-radius: 8px; padding: 10px; font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 0.8rem; cursor: pointer; transition: all .2s; }
+  .btn-customer-reply:hover { opacity: .9; transform: translateY(-1px); }
+  .btn-customer-reply:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+  .chat-bubble.customer2 { background: rgba(124,92,252,.12); border: 1px solid rgba(124,92,252,.25); border-radius: 12px 12px 12px 2px; align-self: flex-start; }
 
   .trust {
     overflow: hidden; padding: 0 0 40px; position: relative;
@@ -2368,12 +2377,20 @@
       ? new Date(complaint.reply_at).toLocaleString('id-ID', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' })
       : null;
 
+    const hasCustomerReply = !!(complaint.customer_reply);
+    const customerReplyAt = complaint.customer_reply_at
+      ? new Date(complaint.customer_reply_at).toLocaleString('id-ID', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' })
+      : null;
+
+    // Tampilkan reply form hanya jika: admin sudah reply, belum resolved, customer belum balas lagi
+    const showReplyForm = hasReply && !isResolved && !hasCustomerReply;
+
     resultEl.innerHTML = `
       <div class="chat-status-bar">
         <div class="chat-status-dot ${isResolved ? 'resolved' : 'open'}"></div>
         <span style="font-size:0.7rem;color:var(--muted)">
           <strong style="color:var(--text)">${lapId}</strong>
-          &nbsp;·&nbsp; ${isResolved ? '✅ Resolved' : '🔴 Menunggu respons CS'}
+          &nbsp;·&nbsp; ${isResolved ? '✅ Resolved' : hasReply ? '💬 Admin sudah membalas' : '🔴 Menunggu respons CS'}
         </span>
       </div>
       <div class="chat-thread" id="chat-thread-${lapId}">
@@ -2393,9 +2410,81 @@
           ⏳ Admin belum membalas.<br>
           <span style="font-size:0.62rem">Biasanya dibalas dalam 1×24 jam.</span>
         </div>`}
+        ${hasCustomerReply ? `
+        <div class="chat-bubble customer2">
+          <div class="chat-who customer">👤 ${complaint.username || 'Customer'} (balasan)</div>
+          <div>${(complaint.customer_reply || '').replace(/</g,'&lt;').replace(/\n/g,'<br>')}</div>
+          <div class="chat-meta">${customerReplyAt || ''}</div>
+        </div>` : ''}
       </div>
-      <button onclick="cekBalasanCS()" style="width:100%;background:transparent;border:1px solid var(--border);border-radius:8px;padding:9px;color:var(--muted);font-size:0.72rem;cursor:pointer;margin-top:2px;">🔄 Refresh Balasan</button>
+      ${showReplyForm ? `
+      <div class="customer-reply-wrap">
+        <div style="font-size:0.63rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">✏️ Balas Admin</div>
+        <textarea class="customer-reply-textarea" id="customer-reply-input-${lapId}" placeholder="Tulis balasan kamu..."></textarea>
+        <button class="btn-customer-reply" id="btn-customer-reply-${lapId}" onclick="kirimBalasanCustomer('${lapId}', '${complaint.username || ''}')">📨 Kirim Balasan</button>
+      </div>` : (hasCustomerReply ? `
+      <div style="font-size:0.68rem;color:var(--green);text-align:center;padding:8px 0;">✅ Balasan kamu sudah dikirim — tunggu respons admin berikutnya.</div>
+      ` : '')}
+      <button onclick="cekBalasanCS()" style="width:100%;background:transparent;border:1px solid var(--border);border-radius:8px;padding:9px;color:var(--muted);font-size:0.72rem;cursor:pointer;margin-top:6px;">🔄 Refresh</button>
     `;
+  }
+
+  async function kirimBalasanCustomer(lapId, username) {
+    const textarea = document.getElementById('customer-reply-input-' + lapId);
+    const btn = document.getElementById('btn-customer-reply-' + lapId);
+    const replyText = (textarea ? textarea.value : '').trim();
+    if (!replyText) { alert('⚠️ Balasan tidak boleh kosong!'); return; }
+
+    btn.disabled = true; btn.textContent = '⏳ Mengirim...';
+
+    const now = new Date().toISOString();
+    let ok = false;
+
+    try {
+      const res = await fetch(SUPA_URL + '/rest/v1/complaints?id=eq.' + encodeURIComponent(lapId), {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SUPA_KEY,
+          'Authorization': 'Bearer ' + SUPA_KEY,
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify({
+          customer_reply: replyText,
+          customer_reply_at: now,
+          status: 'customer_replied'
+        })
+      });
+      if (res.ok) {
+        ok = true;
+      } else {
+        const errText = await res.text();
+        console.error('[CustomerReply] Supabase error:', res.status, errText);
+      }
+    } catch(e) { console.error('[CustomerReply] fetch error:', e); }
+
+    // Backup localStorage
+    try {
+      const list = JSON.parse(localStorage.getItem('rbx_complaints') || '[]');
+      const idx = list.findIndex(c => c.id === lapId);
+      if (idx !== -1) {
+        list[idx].customer_reply = replyText;
+        list[idx].customer_reply_at = now;
+        list[idx].status = 'customer_replied';
+        localStorage.setItem('rbx_complaints', JSON.stringify(list));
+      }
+    } catch(e) {}
+
+    if (ok) {
+      btn.textContent = '✅ Terkirim!';
+      btn.style.background = 'var(--green)';
+      btn.style.color = '#000';
+      setTimeout(() => cekBalasanCS(), 800);
+    } else {
+      btn.disabled = false;
+      btn.textContent = '📨 Kirim Balasan';
+      alert('❌ Gagal mengirim balasan. Coba lagi.');
+    }
   }
   // ── END KELUHAN CS ────────────────────────────────────────────
 
