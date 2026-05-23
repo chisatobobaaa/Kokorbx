@@ -1449,14 +1449,22 @@
       }
     }
 
-    // Sinkronkan status dari rbx_orders lokal (backup)
+    // Sinkronkan proof dari rbx_orders lokal, tapi status SELALU dari rbx_orders_u_ (Supabase)
     const all = JSON.parse(localStorage.getItem('rbx_orders') || '[]');
+    const STATUS_RANK = { 'pending': 0, 'bukti_masuk': 1, 'success': 2, 'failed': 2 };
     return uOrders.map(o => {
       const adminVer = all.find(a => a.id === o.id);
       const proof = getProofImage(o.id);
+      // Status: pakai yang lebih tinggi ranknya (Supabase via uOrders menang atas rbx_orders lama)
+      let finalStatus = o.status;
+      if (adminVer && adminVer.status) {
+        const rankU = STATUS_RANK[o.status] ?? 0;
+        const rankA = STATUS_RANK[adminVer.status] ?? 0;
+        finalStatus = rankA > rankU ? adminVer.status : o.status;
+      }
       if (adminVer) {
         return Object.assign({}, o, {
-          status: adminVer.status || o.status,
+          status: finalStatus,
           sentAt: adminVer.sentAt || o.sentAt,
           proofImage: proof || adminVer.proofImage || o.proofImage,
           bukti: proof || adminVer.bukti || o.bukti,
