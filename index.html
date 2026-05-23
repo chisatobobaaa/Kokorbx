@@ -1965,8 +1965,9 @@
 
       const local = uOrders.find(o => o.id === sRow.id);
       const rawSt = sRow.status || 'pending';
-      const newStatus = (rawSt === 'completed' || rawSt === 'done') ? 'success'
-                      : (rawSt === 'rejected') ? 'failed'
+      const newStatus = (rawSt === 'completed' || rawSt === 'done' || rawSt === 'success') ? 'success'
+                      : (rawSt === 'rejected' || rawSt === 'failed') ? 'failed'
+                      : (rawSt === 'bukti_masuk') ? 'bukti_masuk'
                       : rawSt;
       if (local) {
         // Selalu update sentAt dari Supabase
