@@ -2335,7 +2335,62 @@
     btn.disabled = false; btn.textContent = '📨 Kirim Laporan ke CS';
   }
 
-  // ── CEK BALASAN CS ──────────────────────────────────────────
+  // ── CEK BALASAN CS (FREE CHAT) ───────────────────────────────
+  function _parseChatMessages(complaint) {
+    // Coba baca dari chat_messages (JSON array), fallback ke field lama
+    let msgs = [];
+    if (complaint.chat_messages) {
+      try { msgs = JSON.parse(complaint.chat_messages); } catch(e) { msgs = []; }
+    }
+    // Inject pesan awal customer jika belum ada
+    if (!msgs.find(m => m.role === 'customer' && m.isFirst)) {
+      msgs.unshift({
+        role: 'customer', isFirst: true,
+        text: (complaint.kategori ? '[' + complaint.kategori + '] ' : '') + (complaint.pesan || ''),
+        at: complaint.created_at || new Date().toISOString(),
+        by: complaint.username || 'Customer'
+      });
+    }
+    // Inject reply admin lama jika belum masuk array
+    if (complaint.reply && !msgs.find(m => m.role === 'admin' && m.isLegacy)) {
+      msgs.push({ role: 'admin', isLegacy: true, text: complaint.reply, at: complaint.reply_at || complaint.created_at, by: 'Admin CS' });
+    }
+    // Inject customer_reply lama jika belum masuk array
+    if (complaint.customer_reply && !msgs.find(m => m.role === 'customer' && m.isLegacy)) {
+      msgs.push({ role: 'customer', isLegacy: true, text: complaint.customer_reply, at: complaint.customer_reply_at || complaint.created_at, by: complaint.username || 'Customer' });
+    }
+    return msgs;
+  }
+
+  function _renderChatThread(msgs) {
+    if (!msgs || msgs.length <= 1) {
+      // Hanya pesan awal, tampilkan menunggu
+      const first = msgs[0];
+      return (first ? `<div class="chat-bubble customer">
+        <div class="chat-who customer">👤 ${first.by}</div>
+        <div>${(first.text||'').replace(/</g,'&lt;').replace(/\n/g,'<br>')}</div>
+        <div class="chat-meta">${first.at ? new Date(first.at).toLocaleString('id-ID',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}) : ''}</div>
+      </div>` : '') +
+      `<div class="chat-empty" style="padding:12px 0">⏳ Admin belum membalas.<br><span style="font-size:0.62rem">Biasanya dibalas dalam 1×24 jam.</span></div>`;
+    }
+    return msgs.map(m => {
+      const t = m.at ? new Date(m.at).toLocaleString('id-ID',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}) : '';
+      if (m.role === 'admin') {
+        return `<div class="chat-bubble admin">
+          <div class="chat-who admin">🛡️ ${m.by || 'Admin CS'}</div>
+          <div>${(m.text||'').replace(/</g,'&lt;').replace(/\n/g,'<br>')}</div>
+          <div class="chat-meta">${t}</div>
+        </div>`;
+      } else {
+        return `<div class="chat-bubble customer">
+          <div class="chat-who customer">👤 ${m.by || 'Customer'}</div>
+          <div>${(m.text||'').replace(/</g,'&lt;').replace(/\n/g,'<br>')}</div>
+          <div class="chat-meta">${t}</div>
+        </div>`;
+      }
+    }).join('');
+  }
+
   async function cekBalasanCS() {
     const lapId = (document.getElementById('cek-lap-id').value || '').trim().toUpperCase();
     const resultEl = document.getElementById('cek-balasan-result');
@@ -2369,62 +2424,25 @@
     }
 
     const isResolved = complaint.status === 'resolved';
-    const hasReply = !!(complaint.reply);
-    const createdAt = complaint.created_at
-      ? new Date(complaint.created_at).toLocaleString('id-ID', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' })
-      : '-';
-    const replyAt = complaint.reply_at
-      ? new Date(complaint.reply_at).toLocaleString('id-ID', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' })
-      : null;
-
-    const hasCustomerReply = !!(complaint.customer_reply);
-    const customerReplyAt = complaint.customer_reply_at
-      ? new Date(complaint.customer_reply_at).toLocaleString('id-ID', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' })
-      : null;
-
-    // Tampilkan reply form hanya jika: admin sudah reply, belum resolved, customer belum balas lagi
-    const showReplyForm = hasReply && !isResolved && !hasCustomerReply;
+    const msgs = _parseChatMessages(complaint);
 
     resultEl.innerHTML = `
       <div class="chat-status-bar">
         <div class="chat-status-dot ${isResolved ? 'resolved' : 'open'}"></div>
         <span style="font-size:0.7rem;color:var(--muted)">
           <strong style="color:var(--text)">${lapId}</strong>
-          &nbsp;·&nbsp; ${isResolved ? '✅ Resolved' : hasReply ? '💬 Admin sudah membalas' : '🔴 Menunggu respons CS'}
+          &nbsp;·&nbsp; ${isResolved ? '✅ Selesai' : msgs.length > 1 ? '💬 Ada balasan baru' : '🔴 Menunggu respons CS'}
         </span>
       </div>
       <div class="chat-thread" id="chat-thread-${lapId}">
-        <div class="chat-bubble customer">
-          <div class="chat-who customer">👤 ${complaint.username || 'Customer'}</div>
-          <div><strong>${complaint.kategori || ''}</strong></div>
-          <div style="margin-top:4px">${(complaint.pesan || '').replace(/</g,'&lt;').replace(/\n/g,'<br>')}</div>
-          <div class="chat-meta">${createdAt}</div>
-        </div>
-        ${hasReply ? `
-        <div class="chat-bubble admin">
-          <div class="chat-who admin">🛡️ Admin CS</div>
-          <div>${(complaint.reply || '').replace(/</g,'&lt;').replace(/\n/g,'<br>')}</div>
-          <div class="chat-meta">${replyAt || ''}</div>
-        </div>` : `
-        <div class="chat-empty" style="padding:16px 0">
-          ⏳ Admin belum membalas.<br>
-          <span style="font-size:0.62rem">Biasanya dibalas dalam 1×24 jam.</span>
-        </div>`}
-        ${hasCustomerReply ? `
-        <div class="chat-bubble customer2">
-          <div class="chat-who customer">👤 ${complaint.username || 'Customer'} (balasan)</div>
-          <div>${(complaint.customer_reply || '').replace(/</g,'&lt;').replace(/\n/g,'<br>')}</div>
-          <div class="chat-meta">${customerReplyAt || ''}</div>
-        </div>` : ''}
+        ${_renderChatThread(msgs)}
       </div>
-      ${showReplyForm ? `
+      ${!isResolved ? `
       <div class="customer-reply-wrap">
-        <div style="font-size:0.63rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">✏️ Balas Admin</div>
-        <textarea class="customer-reply-textarea" id="customer-reply-input-${lapId}" placeholder="Tulis balasan kamu..."></textarea>
-        <button class="btn-customer-reply" id="btn-customer-reply-${lapId}" onclick="kirimBalasanCustomer('${lapId}', '${complaint.username || ''}')">📨 Kirim Balasan</button>
-      </div>` : (hasCustomerReply ? `
-      <div style="font-size:0.68rem;color:var(--green);text-align:center;padding:8px 0;">✅ Balasan kamu sudah dikirim — tunggu respons admin berikutnya.</div>
-      ` : '')}
+        <div style="font-size:0.63rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">✏️ Kirim Pesan ke CS</div>
+        <textarea class="customer-reply-textarea" id="customer-reply-input-${lapId}" placeholder="Tulis pesanmu..."></textarea>
+        <button class="btn-customer-reply" id="btn-customer-reply-${lapId}" onclick="kirimBalasanCustomer('${lapId}', '${complaint.username || ''}')">📨 Kirim</button>
+      </div>` : `<div style="font-size:0.68rem;color:var(--green);text-align:center;padding:8px 0;">✅ Laporan ini sudah diselesaikan oleh admin.</div>`}
       <button onclick="cekBalasanCS()" style="width:100%;background:transparent;border:1px solid var(--border);border-radius:8px;padding:9px;color:var(--muted);font-size:0.72rem;cursor:pointer;margin-top:6px;">🔄 Refresh</button>
     `;
   }
@@ -2433,12 +2451,30 @@
     const textarea = document.getElementById('customer-reply-input-' + lapId);
     const btn = document.getElementById('btn-customer-reply-' + lapId);
     const replyText = (textarea ? textarea.value : '').trim();
-    if (!replyText) { alert('⚠️ Balasan tidak boleh kosong!'); return; }
+    if (!replyText) { alert('⚠️ Pesan tidak boleh kosong!'); return; }
 
     btn.disabled = true; btn.textContent = '⏳ Mengirim...';
 
     const now = new Date().toISOString();
     let ok = false;
+
+    // Ambil complaint terbaru dari Supabase untuk dapat chat_messages terkini
+    let complaint = null;
+    try {
+      const res = await fetch(SUPA_URL + '/rest/v1/complaints?id=eq.' + encodeURIComponent(lapId), { headers: SUPA_H });
+      if (res.ok) { const rows = await res.json(); if (rows && rows.length > 0) complaint = rows[0]; }
+    } catch(e) {}
+    if (!complaint) {
+      try {
+        const list = JSON.parse(localStorage.getItem('rbx_complaints') || '[]');
+        complaint = list.find(c => c.id === lapId) || null;
+      } catch(e) {}
+    }
+
+    // Build updated chat_messages
+    const msgs = _parseChatMessages(complaint || { id: lapId, username, pesan: '', created_at: now });
+    msgs.push({ role: 'customer', text: replyText, at: now, by: username || 'Customer' });
+    const chatJson = JSON.stringify(msgs);
 
     try {
       const res = await fetch(SUPA_URL + '/rest/v1/complaints?id=eq.' + encodeURIComponent(lapId), {
@@ -2452,15 +2488,12 @@
         body: JSON.stringify({
           customer_reply: replyText,
           customer_reply_at: now,
-          status: 'customer_replied'
+          status: 'customer_replied',
+          chat_messages: chatJson
         })
       });
-      if (res.ok) {
-        ok = true;
-      } else {
-        const errText = await res.text();
-        console.error('[CustomerReply] Supabase error:', res.status, errText);
-      }
+      if (res.ok) { ok = true; }
+      else { const e = await res.text(); console.error('[CustomerReply] Supabase error:', res.status, e); }
     } catch(e) { console.error('[CustomerReply] fetch error:', e); }
 
     // Backup localStorage
@@ -2471,19 +2504,20 @@
         list[idx].customer_reply = replyText;
         list[idx].customer_reply_at = now;
         list[idx].status = 'customer_replied';
+        list[idx].chat_messages = chatJson;
         localStorage.setItem('rbx_complaints', JSON.stringify(list));
       }
     } catch(e) {}
 
     if (ok) {
-      btn.textContent = '✅ Terkirim!';
-      btn.style.background = 'var(--green)';
-      btn.style.color = '#000';
-      setTimeout(() => cekBalasanCS(), 800);
+      if (textarea) textarea.value = '';
+      btn.disabled = false;
+      btn.textContent = '📨 Kirim';
+      setTimeout(() => cekBalasanCS(), 400);
     } else {
       btn.disabled = false;
-      btn.textContent = '📨 Kirim Balasan';
-      alert('❌ Gagal mengirim balasan. Coba lagi.');
+      btn.textContent = '📨 Kirim';
+      alert('❌ Gagal mengirim pesan. Coba lagi.');
     }
   }
   // ── END KELUHAN CS ────────────────────────────────────────────
