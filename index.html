@@ -924,11 +924,8 @@
 
       <!-- Tab: Cek Balasan -->
       <div class="keluhan-tab-pane" id="pane-balasan">
-        <div class="cek-id-row">
-          <input type="text" id="cek-lap-id" placeholder="Masukkan ID Laporan (LAP-XXXXXX)..." oninput="this.value=this.value.toUpperCase()">
-          <button class="btn-cek-balasan" onclick="cekBalasanCS()">Cek</button>
-        </div>
-        <div id="cek-balasan-result"></div>
+        <input type="hidden" id="cek-lap-id">
+        <div id="cek-balasan-result"><div class="chat-empty">Kirim keluhan dulu untuk mulai chat dengan CS.</div></div>
       </div>
     </div>
   </div>
@@ -2215,13 +2212,11 @@
       document.getElementById('pane-' + t).classList.toggle('active', t === tab);
     });
     if (tab === 'balasan') {
-      // Auto-fill laporan ID setelah kirim
-      if (_lastLapId) {
-        const inp = document.getElementById('cek-lap-id');
-        if (!inp.value) { inp.value = _lastLapId; cekBalasanCS(); }
-      }
-      // Sembunyikan notif dot
       document.getElementById('notif-balasan-dot').style.display = 'none';
+      if (_lastLapId) {
+        document.getElementById('cek-lap-id').value = _lastLapId;
+        cekBalasanCS();
+      }
     }
   }
 
@@ -2327,12 +2322,11 @@
       localStorage.setItem('rbx_complaints', JSON.stringify(list));
     } catch(e) {}
 
-    document.getElementById('k-laporan-id').textContent = lapId;
-    document.getElementById('cek-lap-id').value = lapId;
-    document.getElementById('keluhan-form-wrap').style.display = 'none';
-    document.getElementById('keluhan-success-wrap').style.display = 'block';
-
-    btn.disabled = false; btn.textContent = '📨 Kirim Laporan ke CS';
+    document.getElementById("cek-lap-id").value = lapId;
+    btn.disabled = false; btn.textContent = "📨 Kirim Laporan ke CS";
+    // Reset form dan langsung masuk tab chat
+    resetKeluhanForm();
+    switchKeluhanTab("balasan");
   }
 
   // ── CEK BALASAN CS (FREE CHAT) ───────────────────────────────
