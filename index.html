@@ -1493,9 +1493,9 @@
     list.innerHTML = orders.map(o => {
       // Normalisasi status dari berbagai sumber (Supabase bisa return 'completed'/'done')
       const rawStatus = o.status || 'pending';
-      const normStatus = (rawStatus === 'completed' || rawStatus === 'done') ? 'success'
-                       : (rawStatus === 'rejected' || rawStatus === 'canceled' || rawStatus === 'cancelled') ? 'failed'
-                       : (rawStatus === 'bukti_masuk') ? 'pending'
+      const normStatus = (rawStatus === 'completed' || rawStatus === 'done' || rawStatus === 'success') ? 'success'
+                       : (rawStatus === 'rejected' || rawStatus === 'canceled' || rawStatus === 'cancelled' || rawStatus === 'failed') ? 'failed'
+                       : (rawStatus === 'bukti_masuk') ? 'bukti_masuk'
                        : rawStatus;
       o.status = normStatus; // normalisasi in-place
       const statusClass = normStatus;
@@ -1968,14 +1968,18 @@
       const newStatus = (rawSt === 'completed' || rawSt === 'done') ? 'success'
                       : (rawSt === 'rejected') ? 'failed'
                       : rawSt;
-      if (local && local.status !== newStatus) {
-        local.status = newStatus;
+      if (local) {
+        // Selalu update sentAt dari Supabase
         if (sRow.sent_at) local.sentAt = new Date(sRow.sent_at).getTime();
-        changed = true;
-        if (newStatus === 'success') {
-          showStatusToast('✅ Order ' + sRow.id + ' — Robux berhasil dikirim!', 'success');
-        } else if (newStatus === 'failed') {
-          showStatusToast('❌ Order ' + sRow.id + ' — ditolak oleh admin.', 'error');
+        // Update status hanya kalau berbeda
+        if (local.status !== newStatus) {
+          local.status = newStatus;
+          changed = true;
+          if (newStatus === 'success') {
+            showStatusToast('\u2705 Order ' + sRow.id + ' \u2014 Robux berhasil dikirim!', 'success');
+          } else if (newStatus === 'failed') {
+            showStatusToast('\u274c Order ' + sRow.id + ' \u2014 ditolak oleh admin.', 'error');
+          }
         }
       }
       // Sync proof_url dari Supabase ke lokal
@@ -2049,7 +2053,8 @@
     t._t = setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateX(-50%) translateY(10px)'; }, 4000);
   }
 
-  setInterval(pollOrderStatus, 5000);
+  setInterval(pollOrderStatus, 2000);
+  pollOrderStatus(); // langsung poll saat halaman dibuka
 
   // ── TRUST BAR: start from right, scroll left seamlessly ──
   (function() {
