@@ -62,8 +62,14 @@
   .video-section { max-width: 860px; margin: 8px auto 8px; padding: 0 14px; display: flex; flex-direction: column; align-items: center; }
   .video-section-label { width: 100%; display: flex; align-items: center; gap: 8px; font-size: 0.62rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 10px; }
   .video-section-label::before, .video-section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
-  .video-wrap { position: relative; width: min(320px, 80vw); padding-bottom: min(569px, 142.2vw); border-radius: 16px; overflow: hidden; border: 1px solid var(--border); background: var(--s2); box-shadow: 0 8px 32px rgba(0,0,0,0.4); }
+  .video-wrap { position: relative; width: min(240px, 65vw); padding-bottom: min(427px, 115.6vw); border-radius: 16px; overflow: hidden; border: 1px solid var(--border); background: var(--s2); box-shadow: 0 8px 32px rgba(0,0,0,0.4); }
   .video-wrap video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 16px; }
+  /* Custom fullscreen overlay — tetap portrait */
+  .video-overlay { display: none; position: fixed; inset: 0; z-index: 99999; background: #000; align-items: center; justify-content: center; }
+  .video-overlay.show { display: flex; }
+  .video-overlay-inner { position: relative; height: 100dvh; aspect-ratio: 9/16; max-width: 100vw; overflow: hidden; }
+  .video-overlay-inner video { display: block; width: 100%; height: 100%; object-fit: cover; }
+  .video-overlay-close { position: absolute; top: 12px; right: 12px; background: rgba(0,0,0,0.55); border: 1px solid rgba(255,255,255,0.25); border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #fff; font-size: 1.1rem; z-index: 10; backdrop-filter: blur(6px); }
   .main { max-width: 960px; margin: 12px auto 0; padding: 0 14px 60px; display: grid; grid-template-columns: 1fr 300px; gap: 12px; align-items: start; }
   @media(max-width:720px) { .main { grid-template-columns: 1fr; padding: 0 12px 60px; } }
   .card { background: var(--s1); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 10px; transition: border-color 0.2s; }
@@ -657,9 +663,19 @@
   <div class="video-section">
     <div class="video-section-label">🎬 Tutorial Cara Top Up</div>
     <div class="video-wrap">
-      <video controls playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:12px;">
+      <video id="vid-preview" controls playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:12px;">
         <source src="https://ddsvmskrbebblktsawxi.supabase.co/storage/v1/object/public/assets/tutorial.mp4" type="video/mp4">
       </video>
+    </div>
+  </div>
+
+  <!-- Custom portrait overlay -->
+  <div class="video-overlay" id="video-overlay">
+    <div class="video-overlay-inner">
+      <video id="vid-overlay" playsinline>
+        <source src="https://ddsvmskrbebblktsawxi.supabase.co/storage/v1/object/public/assets/tutorial.mp4" type="video/mp4">
+      </video>
+      <button class="video-overlay-close" onclick="closeVideoOverlay()">✕</button>
     </div>
   </div>
 
@@ -2033,9 +2049,58 @@
   }
 
   setInterval(pollOrderStatus, 2000);
-  pollOrderStatus(); // langsung poll saat halaman dibuka
+  pollOrderStatus();
 
-  // ── TRUST BAR: muncul dari kanan, hilang ke kiri sampai habis, ulang ──
+  // ── INTERCEPT FULLSCREEN → custom portrait overlay ──
+  (function() {
+    const preview = document.getElementById('vid-preview');
+    const overlay = document.getElementById('vid-overlay');
+    const box     = document.getElementById('video-overlay');
+
+    // Intercept fullscreen request dari tombol native
+    function onFullscreenReq(e) {
+      // Batalkan fullscreen native
+      e.preventDefault();
+      e.stopPropagation();
+      openOverlay();
+    }
+
+    // Saat video mau masuk fullscreen, cegat
+    preview.addEventListener('webkitbeginfullscreen', openOverlay);    // iOS Safari
+    preview.addEventListener('fullscreenchange', () => {
+      if (document.fullscreenElement === preview) {
+        document.exitFullscreen().catch(() => {});
+        openOverlay();
+      }
+    });
+    preview.addEventListener('webkitfullscreenchange', () => {
+      if (document.webkitFullscreenElement === preview) {
+        document.webkitExitFullscreen && document.webkitExitFullscreen();
+        openOverlay();
+      }
+    });
+
+    function openOverlay() {
+      overlay.currentTime = preview.currentTime;
+      box.classList.add('show');
+      document.body.style.overflow = 'hidden';
+      if (overlay.readyState >= 1) { overlay.play(); }
+      else { overlay.addEventListener('loadedmetadata', () => overlay.play(), { once: true }); overlay.load(); }
+      preview.pause();
+    }
+
+    window.closeVideoOverlay = function() {
+      preview.currentTime = overlay.currentTime;
+      overlay.pause();
+      box.classList.remove('show');
+      document.body.style.overflow = '';
+    };
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && box.classList.contains('show')) window.closeVideoOverlay();
+    });
+  })();
+
   (function() {
     const track = document.querySelector('.trust-track');
     if (!track) return;
